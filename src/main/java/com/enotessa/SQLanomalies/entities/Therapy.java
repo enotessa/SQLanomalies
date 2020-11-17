@@ -1,6 +1,7 @@
 package com.enotessa.SQLanomalies.entities;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -9,21 +10,12 @@ public class Therapy {
     private Integer id_therapy;
     private String description;
 
-
-    private Set<Dia_th> dia_ths;
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "therapy")//targetEntity=com.enotessa.SQLanomalies.entities.Dia_th.class)
-    public Set<Dia_th> getDia_ths() {
-        return dia_ths;
-    }
-
-    public void setDia_ths(Set<Dia_th> dia_ths) {
-        this.dia_ths = dia_ths;
-    }
-
+    @ManyToMany(mappedBy = "therapies")
+    private Set<Diagnosis> diagnoses = new HashSet<>();
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId_therapy() {
         return id_therapy;
     }

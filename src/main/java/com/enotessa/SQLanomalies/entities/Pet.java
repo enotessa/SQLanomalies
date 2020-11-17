@@ -36,10 +36,8 @@ public class Pet {
 
 
 
-
-
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId_pet() {
         return id_pet;
     }

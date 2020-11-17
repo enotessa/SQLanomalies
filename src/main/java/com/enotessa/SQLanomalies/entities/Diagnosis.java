@@ -11,30 +11,28 @@ public class Diagnosis {
     private String name_dia;
     private String description_dia;
 
-    /*@ManyToMany(cascade = { CascadeType.ALL })
+    @ManyToMany(cascade = { CascadeType.ALL })
     @JoinTable(
             name = "app_dia",
             joinColumns = { @JoinColumn(name = "id_diagnosis") },
             inverseJoinColumns = { @JoinColumn(name = "id_appointment") }
     )
-    Set<Appointment> appointments = new HashSet<>();*/
+    Set<Appointment> appointments = new HashSet<>();
 
+    @ManyToMany(cascade = { CascadeType.ALL })
+    @JoinTable(
+            name = "dia_th",
+            joinColumns = { @JoinColumn(name = "id_diagnosis") },
+            inverseJoinColumns = { @JoinColumn(name = "id_therapy") }
+    )
+    Set<Therapy> therapies = new HashSet<>();
 
-    private Set<Dia_th> dia_th;
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "diagnosis")//targetEntity=com.enotessa.SQLanomalies.entities.Dia_th.class)
-    public Set<Dia_th> getDia_th() {
-        return dia_th;
-    }
-
-    public void setDia_th(Set<Dia_th> dia_th) {
-        this.dia_th = dia_th;
-    }
 
 
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId_diagnosis() {
         return id_diagnosis;
     }

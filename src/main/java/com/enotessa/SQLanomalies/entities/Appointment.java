@@ -1,12 +1,17 @@
 package com.enotessa.SQLanomalies.entities;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "Appointment")
 public class Appointment {
     private Integer id_appointment;
     private String date_app; //TODO date
+
+    @ManyToMany(mappedBy = "appointments")
+    private Set<Diagnosis> diagnoses = new HashSet<>();
 
     private Doctor doctor;
     @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
@@ -31,7 +36,7 @@ public class Appointment {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId_appointment() {
         return id_appointment;
     }

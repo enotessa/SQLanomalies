@@ -27,7 +27,7 @@ public class Owner {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId_owner() {
         return id_owner;
     }

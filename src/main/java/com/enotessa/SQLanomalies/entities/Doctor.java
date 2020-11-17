@@ -6,11 +6,17 @@ import java.util.Set;
 @Entity
 @Table(name = "Doctor")
 public class Doctor {
+    @Column(name = "id_doctor")
     private Integer id_doctor;
+    @Column(name = "lname_d")
     private String lname_d;
+    @Column(name = "name_d")
     private String name_d;
+    @Column(name = "patron_d")
     private String patron_d;
+    @Column(name = "N_cabinet")
     private Integer N_cabinet;
+    @Column(name = "tel_d")
     private String tel_d;
 
 
@@ -27,7 +33,7 @@ public class Doctor {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId_doctor() {
         return id_doctor;
     }

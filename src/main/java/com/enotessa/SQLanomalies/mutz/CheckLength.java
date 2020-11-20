@@ -12,36 +12,36 @@ package com.enotessa.SQLanomalies.mutz;
 это текущая длина строки ресурса.
               p(|x - \mu| > |l - \mu|) < \sigma^2 / (l - \mu)^2*/
 
-public class CheckLength {
+import com.enotessa.SQLanomalies.ReadSQL;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
+/**
+ * Модель: Длина строки
+ */
+public class CheckLength {
+    public double mean; // среднее значение длин mu
+    public double var;  // выборочная дисперсия sigma^2
+    ArrayList<Integer> lengths = new ArrayList();
+
+    public void train(ArrayList<String> sequences){
+        sequences.forEach(sequence -> lengths.add(sequence.length()));
+        mean = 0;
+        for (Integer x: lengths)
+            mean += x;
+        mean /= lengths.size();
+        double temp = 0;
+        for(double x : lengths)
+            temp += (x-mean)*(x-mean);
+        var = temp/(lengths.size()-1);
+    }
+
+    public boolean validate(String sequence){
+        double threshold = 0.1;
+        double upper_bound = this.var / Math.pow((sequence.length() - this.mean) , 2);
+        return upper_bound >= threshold;
+    }
 }
 
-/*
-import numpy as np
-
-
-
-
-class CheckLengthModel(typing.NamedTuple):
-        mean: float
-        var: float
-
-
-        def train(sequences: typing.Iterable[str], verbose: bool=False) \
-        -> CheckLengthModel:
-        if verbose:
-        print(f'Training LengthModel with {len(sequences)} sequences')
-
-        lengths = np.fromiter(map(len, sequences), int)
-
-        return CheckLengthModel(
-        mean=np.mean(lengths),
-        var=np.var(lengths)
-        )
-
-
-        def validate(model: CheckLengthModel, sequence: str,
-        threshold: float=0.1) -> bool:
-        upper_bound = model.var / (len(sequence) - model.mean) ** 2
-
-        return upper_bound >= threshold*/

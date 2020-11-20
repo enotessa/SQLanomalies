@@ -60,7 +60,9 @@ public class App
         checkLength.train(readSQL.arrayList);
         System.out.println("var(средн значение) = " + checkLength.var+" , mean(дисперсия) = "+checkLength.mean);
         System.out.println(checkLength.validate("UPDATE owner SET patron = \"Игоревич\" WHERE tel = \"89527356477\";"));
+
         checkDistribution.train(readSQL.arrayList);
+        //System.out.println(checkDistribution.validate("UPDATE owner SET patron = \"Игоревич\" WHERE tel = \"89527356477\";"));
 
 
 

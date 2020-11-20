@@ -47,6 +47,16 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3
+        Проект Apache Commons Math - это библиотека легких, автономных математических и статистических компонентов,
+        предназначенных для решения наиболее распространенных практических проблем, которые не доступны сразу
+        в языке программирования Java или commons-lang.-->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6.1</version>
+        </dependency>
+
     </dependencies>
 	<build>
 		<plugins>

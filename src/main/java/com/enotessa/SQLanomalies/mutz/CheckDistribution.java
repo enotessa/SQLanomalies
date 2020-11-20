@@ -3,90 +3,109 @@ package com.enotessa.SQLanomalies.mutz;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class CheckDistribution {
-    HashMap<String, Integer> order = new HashMap<>();
-    /*HashMap<Character, Float> frequency = new HashMap<>();*/
+    HashMap<Character, Double> collapsСhars = new HashMap<>(); // для подсчета символов
+    //ArrayList<HashMap<Character, Double>> frequencies = new ArrayList();
+    HashMap<Character, Double> frequencies = new HashMap();
+    HashMap<Character, Double> globalFrequencies = new HashMap<>();
 
-    HashMap<Character, Integer> collapsСhars = new HashMap<>(); // для подсчета символов
-    ArrayList<HashMap<Character, Float>> frequencies = new ArrayList();
-    //HashMap<Integer, HashMap<Character, Float>> frequencies = new HashMap<>();
-    HashMap<Character, Float> globalFrequencies = new HashMap<>();
-
-    public CheckDistribution(){
-        for (int i = 0; i<=9; i++)
-            collapsСhars.put((char)(i + '0'), 0);
-        for (int i = (int)'a'; i <= (int)'z'; i++)
-            collapsСhars.put((char) i, 0);
-        for (int i = (int)'A'; i <= (int)'Z'; i++)
-            collapsСhars.put((char) i, 0);
-
-        for (int i = 0; i<=9; i++)
-            globalFrequencies.put((char)(i + '0'), (float) 0.0);
-        for (int i = (int)'a'; i <= (int)'z'; i++)
-            globalFrequencies.put((char) i, (float) 0.0);
-        for (int i = (int)'A'; i <= (int)'Z'; i++)
-            globalFrequencies.put((char) i, (float) 0.0);
+    public void fillCollapsСhars(String sequence) { // Подсчет количества вхождений для каждого символа
+        char ch;
+        for (int i = 0; i < sequence.length(); i++) {
+            ch = sequence.charAt(i);
+            if (collapsСhars.containsKey(ch))
+                collapsСhars.put(ch, collapsСhars.get(ch) + 1);
+            else collapsСhars.put(ch, (double) 1);
+        }
     }
 
-    public HashMap<Character, Float> computeUnorderedFrequency(String sequence){
+    public HashMap<Character, Double> computeUnorderedFrequency(String sequence) {
         // Подсчет количества вхождений для каждого символа
-        HashMap<Character, Float> frequency = new HashMap<>();
+        HashMap<Character, Double> frequency = new HashMap<>();
         char ch;
-        for (int i=0;i<sequence.length();i++) {
+        for (int i = 0; i < sequence.length(); i++) {
             ch = sequence.charAt(i);
-            if (collapsСhars.containsKey(ch)) {
-                collapsСhars.put(ch, collapsСhars.get(ch) + 1);
-            }
+            if (frequency.containsKey(sequence.charAt(i)))
+                frequency.put(ch, frequency.get(ch) + 1);
+            else frequency.put(ch, (double) 1);
         }
-        for (int i = 0; i<=9; i++)
-            frequency.put((char)(i + '0'), (Float.valueOf(collapsСhars.get((char)(i + '0')))) / sequence.length());
-        for (int i = (int)'a'; i <= (int)'z'; i++)
-            frequency.put((char) i, (Float.valueOf(collapsСhars.get((char) i))) / sequence.length());
-        for (int i = (int)'A'; i <= (int)'Z'; i++)
-            frequency.put((char) i, (Float.valueOf(collapsСhars.get((char) i))) / sequence.length());
         return frequency;
     }
 
-    public void train(ArrayList<String> sequences){
+    public void train(ArrayList<String> sequences) {
         // Частота вычисления для каждой последовательности
-        int i=0;
-        for (String sequence : sequences){
-            frequencies.add(computeUnorderedFrequency(sequence));
-            //frequencies.put(i, computeUnorderedFrequency(sequence));
-            i++;
+        double countAllChars = 0;
+        // Заполняем collapsСhars, т.е. считаем количество каждых символов
+        for (String sequence : sequences) {
+            fillCollapsСhars(sequence);
+            countAllChars += sequence.length();
         }
-        //frequency.clear();
-        //sequences.forEach(this::computeUnorderedFrequency);
+        // вычисляем частоту каждого символа
+        double finalCountAllChars1 = countAllChars;
+        collapsСhars.forEach((k, v) ->{
+            globalFrequencies.put(k, v/ finalCountAllChars1);
+        });
 
-        // вычислить частоту по всем последовательностям
-        i=0;
-        for (HashMap<Character, Float> frequency : frequencies) {
-            for (Map.Entry<Character, Float> pair: frequency.entrySet())
-                globalFrequencies.put(pair.getKey(), globalFrequencies.get(pair.getKey())+pair.getValue());
-            i++;
+
+        /*for (String sequence : sequences) {
+            frequencies.add(computeUnorderedFrequency(sequence));
         }
-        int lengthOfFrequencies = frequencies.size();
-        for (Map.Entry<Character, Float> pair: globalFrequencies.entrySet())
-            globalFrequencies.put(pair.getKey(), pair.getValue()/lengthOfFrequencies);  // вычислили среднюю частоту по всем обучающим последовательностям
+        // вычислить частоту по всем последовательностям
+        for (HashMap<Character, Double> frequency : frequencies) {
+            for (Map.Entry<Character, Double> pair : frequency.entrySet())
+                if (globalFrequencies.containsKey(pair.getKey()))
+                    globalFrequencies.put(pair.getKey(), globalFrequencies.get(pair.getKey()) + pair.getValue());
+                else globalFrequencies.put(pair.getKey(), pair.getValue());
+        }
+        double finalCountAllChars = countAllChars;
+        globalFrequencies.replaceAll((k, v) -> v / finalCountAllChars);  // вычислили среднюю частоту по всем обучающим последовательностям
+        System.out.println(finalCountAllChars);
+        System.out.println(1.0 / finalCountAllChars);*/
+        double u=0;
+        for (Map.Entry<Character, Double> pair: globalFrequencies.entrySet())
+            u+=pair.getValue();
+        System.out.println(u);
     }
 
-    public boolean validate(String sequence){
-        /*double threshold = 0.1;
+    public boolean validate(String sequence) {
+        double threshold = 0.1;
         // Построить частотный массив для данной строки
-        HashMap<Character, Float> frequency = new HashMap<>(computeUnorderedFrequency(sequence));
-        for (Map.Entry<Character, Float> pair: frequency.entrySet()){
-            if (!globalFrequencies.containsKey(pair.getKey())){
+        HashMap<Character, Double> frequency = new HashMap<>();
+        frequency = computeUnorderedFrequency(sequence);
+        for (Map.Entry<Character, Double> pair : frequency.entrySet()) {
+            if (!globalFrequencies.containsKey(pair.getKey())) {
                 System.out.println("Invalid character");
                 return false;
             }
         }
         // Сравнить входную последовательность с опорной частотой
+        //ChiSquareTest chiSquareTest = new ChiSquareTest();
+        //chiSquareTest.chiSquare();
+        frequency.replaceAll((k, v) -> v / sequence.length());  // вычислили частоту для данной строки
 
-        *//*
-        (chisq, p) = scipy.stats.chisquare(ordered_frequency, model.frequency)*//*
-        return p >= threshold;*/
-        return true;
+        double p = chiSquareTest(globalFrequencies, frequency);
+        System.out.println(p);
+        return p >= threshold;
+    }
+
+    double chiSquareTest(HashMap<Character, Double> observed, HashMap<Character, Double> expected) {
+        HashMap<Character, Double> tp = new HashMap<>();
+        double p = (double) 0.0;
+        //Chi Square Formula
+        for (Map.Entry<Character, Double> pair : observed.entrySet()) {
+            char key = pair.getKey();
+            double expectedValue = 0;
+            if (expected.containsKey(key)) expectedValue = expected.get(key);
+            else expectedValue = 0;
+            tp.put(key, observed.get(key) - expectedValue);
+            tp.put(key, tp.get(key) * tp.get(key));
+            tp.put(key, tp.get(key) / expectedValue);
+            p = p + tp.get(key);
+        }
+        p /= observed.size();
+        return p;
     }
 
 }

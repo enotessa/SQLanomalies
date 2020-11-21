@@ -1,6 +1,7 @@
 package com.enotessa.SQLanomalies;
 
 import com.enotessa.SQLanomalies.mutz.CheckDistribution;
+import com.enotessa.SQLanomalies.mutz.CheckGramma;
 import com.enotessa.SQLanomalies.mutz.CheckLength;
 import com.enotessa.SQLanomalies.persistence.HibernateUtil;
 import org.hibernate.Session;
@@ -56,13 +57,18 @@ public class App
 
         CheckLength checkLength = new CheckLength();
         CheckDistribution checkDistribution = new CheckDistribution();
+        CheckGramma checkGramma = new CheckGramma();
+        System.out.println("Введите проверяемую строку");
+        //String str = in.nextLine();
+        String str = "UPDATE owner SET patron = \"Игоревич\" WHERE tel = \"89527356477\";";
 
         checkLength.train(readSQL.arrayList);
-        System.out.println("var(средн значение) = " + checkLength.var+" , mean(дисперсия) = "+checkLength.mean);
-        System.out.println(checkLength.validate("UPDATE owner SET patron = \"Игоревич\" WHERE tel = \"89527356477\";"));
+        System.out.println("Проверка на длину строки : " + checkLength.validate(str));
 
         checkDistribution.train(readSQL.arrayList);
-        //System.out.println(checkDistribution.validate("UPDATE owner SET patron = \"Игоревич\" WHERE tel = \"89527356477\";"));
+        System.out.println("Проверка на распределение символов строки : " + checkDistribution.validate(str));
+
+        checkGramma.train(readSQL.arrayList);
 
 
 

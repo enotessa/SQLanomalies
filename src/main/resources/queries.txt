@@ -9,7 +9,7 @@ DELETE FROM pet WHERE name_pet = "Саманта";
 
 UPDATE pet SET name_pet = "Габриэлла" WHERE id_pet = 200009;
 
-SELECT count(id_owner) AS count_owner_from_Moscow FROM owner WHERE address REGEXP "г.Москва"=1;
+SELECT count(id_owner) AS count_owner_from_Moscow FROM owner WHERE address REGEXP "г.Москва" = 1;
 
 INSERT INTO owner VALUES
 (100006, "Рубеко", "Андрей", "Сергеевич", "г.Москва, ул.Костикова, д.13", "89304627544");
@@ -50,15 +50,15 @@ UPDATE diagnosis SET description_dia = "хроническое воспалит�
 SELECT DISTINCT concat(doctor.lname_d, ' ' , doctor.name_d,' ', doctor.patron_d) AS FIO FROM app_dia NATURAL JOIN appointment NATURAL JOIN doctor
 WHERE id_diagnosis IN (SELECT id_diagnosis FROM diagnosis WHERE name_dia='чума');
 
-SELECT DISTINCT name_pet FROM pet NATURAL JOIN appointment WHERE id_doctor IN (SELECT id_doctor FROM doctor WHERE lname_d='Чернов');
+SELECT DISTINCT name_pet FROM pet NATURAL JOIN appointment WHERE id_doctor IN (SELECT id_doctor FROM doctor WHERE lname_d = 'Чернов');
 
-SELECT name_dia FROM diagnosis NATURAL JOIN app_dia WHERE id_diagnosis IN (SELECT id_diagnosis FROM app_dia NATURAL JOIN appointment NATURAL JOIN pet WHERE name_pet="Мила");
+SELECT name_dia FROM diagnosis NATURAL JOIN app_dia WHERE id_diagnosis IN (SELECT id_diagnosis FROM app_dia NATURAL JOIN appointment NATURAL JOIN pet WHERE name_pet = "Мила");
 
 SELECT diagnosis.name_dia FROM app_dia NATURAL JOIN diagnosis NATURAL JOIN appointment
 GROUP BY id_diagnosis HAVING count(id_diagnosis) = (SELECT max(count_dia)
 FROM (SELECT count(diagnosis.id_diagnosis) AS count_dia FROM app_dia NATURAL JOIN diagnosis NATURAL JOIN appointment GROUP BY id_diagnosis) AS tab1);
 
-SELECT count(id_pet) AS count_pet_from_Moscow FROM pet NATURAL JOIN owner WHERE owner.address REGEXP "г.Тверь"=1;
+SELECT count(id_pet) AS count_pet_from_Moscow FROM pet NATURAL JOIN owner WHERE owner.address REGEXP "г.Тверь" = 1;
 
 SELECT diagnosis.name_dia, pet.name_pet FROM app_dia NATURAL JOIN diagnosis NATURAL JOIN pet NATURAL JOIN appointment ORDER BY diagnosis.name_dia;
 
@@ -68,10 +68,10 @@ FROM (SELECT count(id_appointment) AS employment FROM appointment NATURAL JOIN d
 
 SELECT DISTINCT concat(lname, ' ' , name,' ', patron) AS FIO, tel FROM owner;
 
-SELECT max(appointment.date_app) AS date FROM app_dia NATURAL JOIN appointment NATURAL JOIN diagnosis WHERE diagnosis.name_dia="чума" ;
+SELECT max(appointment.date_app) AS date FROM app_dia NATURAL JOIN appointment NATURAL JOIN diagnosis WHERE diagnosis.name_dia = "чума" ;
 
 SELECT date_add(appointment.date_app, interval (SELECT sum(dia_th.duration) FROM dia_th NATURAL JOIN diagnosis
-GROUP BY diagnosis.id_diagnosis HAVING diagnosis.id_diagnosis=a1.id_diagnosis) DAY) AS end_of_therapy
-FROM app_dia AS a1 NATURAL JOIN diagnosis NATURAL JOIN appointment WHERE id_appointment=600004;
+GROUP BY diagnosis.id_diagnosis HAVING diagnosis.id_diagnosis = a1.id_diagnosis) DAY) AS end_of_therapy
+FROM app_dia AS a1 NATURAL JOIN diagnosis NATURAL JOIN appointment WHERE id_appointment = 600004;
 
-SELECT pet.name_pet FROM appointment NATURAL JOIN doctor AS doc NATURAL JOIN pet WHERE EXISTS (SELECT lname_d FROM doctor WHERE lname_d =doc.lname_d AND lname_d='Ермаков');
+SELECT pet.name_pet FROM appointment NATURAL JOIN doctor AS doc NATURAL JOIN pet WHERE EXISTS (SELECT lname_d FROM doctor WHERE lname_d =doc.lname_d AND lname_d = 'Ермаков');

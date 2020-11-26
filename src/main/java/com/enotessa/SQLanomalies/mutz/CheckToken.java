@@ -7,7 +7,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+//TODO придумать запросы для перечислений. То есть таких, чтобы значений атрибута было мало, а самих атрибуьов много. (повторяющиеся атрибуты)
+
+// Поиск токенов. независимая модель
 public class CheckToken {
+    double threshold;
+
     HashMap<String, ArrayList<String>> tokens = new HashMap<>();
     HashMap<String, ArrayList<String>> tokensCopy = new HashMap<>();
     HashMap<String, Double> probabilities;
@@ -15,7 +20,6 @@ public class CheckToken {
     public void train(ArrayList<String> sequences) {
         for (String sequence : sequences)
             token(sequence);
-        //tokens.entrySet().forEach(System.out::println);
         for (Map.Entry<String, ArrayList<String>> pair : tokens.entrySet())
             tokensCopy.put(pair.getKey(), new ArrayList<String>(pair.getValue()));
 
@@ -28,20 +32,52 @@ public class CheckToken {
             K=pair.getValue().size();
             probabilities.put(pair.getKey(), probabilityForTrain(sequences, pair.getKey(),K));
         }
-
-        //System.out.println("===========================\n\n");
-        //tokensCopy.entrySet().forEach(System.out::println);
-        //probabilities.entrySet().forEach(System.out::println);
-        //sequences.forEach(System.out::println);
     }
 
-    public boolean validate(String sequence) {
-        double threshold = 0.563;
-        int K;
+    /*void findingThreshold(ArrayList<String> sequences) {
+        threshold = 0;
+        double p;
+        for (String str : sequences) {
+            p = probability(str);
+            if (threshold == 0)
+                threshold = p;
+            else if (threshold < p) {
+                threshold = p;
+            }
+        }
+    }*/
+
+    /*double probability(String sequence) {
+        HashMap<String, Double> probabilitiesSequence;
+        double K=0;
         HashMap<String, ArrayList<String>> tokensSequence = new HashMap<>();
         String regex = "(([^ .]*)( (=|>=|<=|<|>|LIKE) )([^ (]*)( |;))";
         Pattern pattern = Pattern.compile( regex );
         Matcher matcher = pattern.matcher(sequence);
+        // ищем токены
+        while (matcher.find()){
+            if (tokensSequence.containsKey(matcher.group(2)))
+                tokensSequence.get(matcher.group(2)).add(matcher.group(5));
+            else tokensSequence.put(matcher.group(2), new ArrayList<String>(Collections.singleton(matcher.group(5))));
+        }
+        boolean F;
+        for (Map.Entry<String, ArrayList<String>> pair : tokensSequence.entrySet()) {
+            K=pair.getValue().size();
+            probabilitiesSequence.put(pair.getKey(), probabilityForTrain(sequences, pair.getKey(),K));
+
+        }
+
+    }*/
+
+
+
+    public boolean validate(String sequence) {
+        double threshold = 0.563;
+        HashMap<String, ArrayList<String>> tokensSequence = new HashMap<>();
+        String regex = "(([^ .]*)( (=|>=|<=|<|>|LIKE) )([^ (]*)( |;))";
+        Pattern pattern = Pattern.compile( regex );
+        Matcher matcher = pattern.matcher(sequence);
+        // ищем токены
         while (matcher.find()){
             if (tokensSequence.containsKey(matcher.group(2)))
                 tokensSequence.get(matcher.group(2)).add(matcher.group(5));
@@ -63,7 +99,7 @@ public class CheckToken {
         return true;
     }
 
-    double probability(String sequence, HashMap<String, ArrayList<String>> tokensSequence, double K, String key){
+    /*double probability(String sequence, HashMap<String, ArrayList<String>> tokensSequence, double K, String key){
         double probability=0;
         double N=1, n=1;
         double k=0;
@@ -79,11 +115,11 @@ public class CheckToken {
             }
             F = false;
         }
-        probability = Math.abs(k / K - (double) n / N);
+        probability = Math.abs(k / K - n / N);
 
 
         return probability*Math.sqrt(K);
-    }
+    }*/
 
 
     double probabilityForTrain(ArrayList<String> sequences, String key,double K){
@@ -139,13 +175,5 @@ public class CheckToken {
             else tokens.put(matcher.group(2), new ArrayList<String>(Collections.singleton(matcher.group(5))));
             result = result.replace(matcher.group(5), "#$"+matcher.group(2));
         }
-        /*pattern = Pattern.compile( regexForNotString );
-        matcher = pattern.matcher(sequence);
-        while (matcher.find()){
-            if (tokens.containsKey(matcher.group(2)))
-                tokens.get(matcher.group(2)).add(matcher.group(5));
-            else tokens.put(matcher.group(2), new ArrayList<String>(Collections.singleton(matcher.group(5))));
-            result = result.replace(matcher.group(5), "#$"+matcher.group(2));
-        }*/
     }
 }

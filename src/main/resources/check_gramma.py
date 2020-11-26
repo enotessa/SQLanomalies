@@ -3,14 +3,14 @@ from __future__ import division
 from __future__ import absolute_import
 import copy
 import math
-import typing
 import Queue
 import itertools
 import functools
 from itertools import imap
 from itertools import izip
 from collections import namedtuple
-
+from collections import defaultdict
+from operator import itemgetter
 
 collaps_chars = dict()
 collaps_chars.update(dict((char, u'<0-9>') for char in u'0123456789'))
@@ -19,10 +19,10 @@ collaps_chars.update(dict((char, u'<A-F>') for char in u'ABCDEF'))
 collaps_chars.update(dict((char, u'<g-z>') for char in u'ghijklmnopqurstuvwxyz'))
 collaps_chars.update(dict((char, u'<G-Z>') for char in u'GHIJKLMNOPQURSTUVWXYZ'))
 
-GrammaNodeType = typing.TypeVar(u'GrammaNode', bound=u'GrammaNode')
-KeyType = typing.TypeVar(u'Key')
-ValueType = typing.TypeVar(u'Value')
-TokensType = typing.List[unicode]
+#GrammaNodeType = typing.TypeVar(u'GrammaNode', bound=u'GrammaNode')
+#KeyType = typing.TypeVar(u'Key')
+#ValueType = typing.TypeVar(u'Value')
+#TokensType = typing.List[unicode]
 
 
 def tokenize(sequence):                                                      # -------------------------------------------------
@@ -32,7 +32,7 @@ def tokenize(sequence):                                                      # -
     ]
 
 
-class SparseDefaultDict(typing.DefaultDict[KeyType, ValueType]):
+class SparseDefaultDict(defaultdict):
     # The typing.DefaultDict will create an item in the dict when it is read,
     # even if the item is never written to. To prevent this, create a subtype
     # with a __missing__ handler.
@@ -44,8 +44,8 @@ class SparseDefaultDict(typing.DefaultDict[KeyType, ValueType]):
 #    log_properbility=0
 #    path=0
 
-SequenceSolution = namedtuple('SequenceSolution', ['log_properbility', 'path'])    
-    
+SequenceSolution = namedtuple('SequenceSolution', ['log_properbility', 'path'])
+
 
 
 
@@ -54,24 +54,24 @@ BeamSearchQueueItem = namedtuple('BeamSearchQueueItem', ['neg_log_p', 'node', 'p
 
 
 #class BeamSearchQueueItem(object):
-##  
-##    
- #   def __init__(self, neg_log_p, node, path):
- #       self.neg_log_p=neg_log_p
-  #      self.node=node
-  #      self.path=path
+##
+##
+#   def __init__(self, neg_log_p, node, path):
+#       self.neg_log_p=neg_log_p
+#      self.node=node
+#      self.path=path
 #
- #   def __eq__(self, other):
-  #      if not isinstance(other, BeamSearchQueueItem):
-   #         return NotImplemented
+#   def __eq__(self, other):
+#      if not isinstance(other, BeamSearchQueueItem):
+#         return NotImplemented
 #
- #       return self.neg_log_p == other.neg_log_p
+#       return self.neg_log_p == other.neg_log_p
 #
- #   def __lt__(self, other):
-  #      if not isinstance(other, BeamSearchQueueItem):
-   #         return NotImplemented
+#   def __lt__(self, other):
+#      if not isinstance(other, BeamSearchQueueItem):
+#         return NotImplemented
 #
- #       return self.neg_log_p < other.neg_log_p
+#       return self.neg_log_p < other.neg_log_p
 
 
 BeamSearchQueueItem = functools.total_ordering(BeamSearchQueueItem)
@@ -110,10 +110,10 @@ class GrammaNode(object):
             ])
 
     def stringify_transition(self):
-            return u', '.join([
-                u'{properbility} -> {index}'
-                for index, properbility in self.transition.items()
-            ])
+        return u', '.join([
+            u'{properbility} -> {index}'
+            for index, properbility in self.transition.items()
+        ])
 
     def stringify(self):
         return (u'{self.index}: ({self.stringify_emission()}) ==> '
@@ -176,11 +176,12 @@ class GrammaNode(object):
                                  total_aggregated_emissions)
         node_emission_rescale = (node.num_aggregated_emissions /
                                  total_aggregated_emissions)
-
-        for char in (self.emission.keys() | node.emission.keys()):
+        #WARN HERE
+        #for char in (self.emission.keys() | node.emission.keys()):
+        for char in (set(self.emission.keys()) | set(node.emission.keys())):
             self.emission[char] = (
-                self_emission_rescale * self.emission[char] +
-                node_emission_rescale * node.emission[char]
+                    self_emission_rescale * self.emission[char] +
+                    node_emission_rescale * node.emission[char]
             )
 
         self.num_aggregated_emissions = total_aggregated_emissions
@@ -202,45 +203,82 @@ class GrammaNode(object):
 
         # Exclude transitions that will become a self-recursive transition
         # when merged. They need to be treated specially.
+        print 'WARN:  self.transition:{}, node.transition:{}, self.index:{}, node.index:{}'.format(self.transition.keys(),node.transition.keys(),self.index,node.index)
+
         non_self_recursive_transitions = (
-            (self.transition.keys() | node.transition.keys()) -
-            set([self.index, node.index])
+            #WARN HERE
+                ( set(self.transition.keys()) | set(node.transition.keys())) -
+                set([self.index, node.index])
         )
+        print 'non_self_recursive_transitions:{}'.format(non_self_recursive_transitions)
+        print 'merge_transitions 1: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
+
         for index in non_self_recursive_transitions:
             self.transition[index] = (
-                self_transition_rescale * self.transition[index] +
-                node_transition_rescale * node.transition[index]
+                    #self_transition_rescale * self.transition[index] +
+                    self_transition_rescale * itemgetter(index)(copy.copy(self.transition)) +
+                    #node_transition_rescale * node.transition[index]
+                    node_transition_rescale * itemgetter(index)(copy.copy(node.transition))
             )
+        print 'merge_transitions 2: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
 
         # For the self-recursive transition, there are a few more links to
         # consider when merging.
+        #self_recursive_link=0.0
+
+        #JYTHON BUG HERE!!!!!!!
+        #stsi =copy.copy(self.transition[self.index])
+        stsi =itemgetter(self.index)(copy.copy(self.transition))
+        #stni = copy.copy(self.transition[node.index])
+        stni = itemgetter(node.index)(copy.copy(self.transition))
+        print 'ntni before {}'.format(node.transition.keys())
+        #ntni = copy.copy(node.transition[node.index])
+        ntni = itemgetter(node.index)(copy.copy(node.transition))
+        print 'ntni after {}'.format(node.transition.keys())
+
+        #ntsi = copy.deepcopy(node.transition[self.index])
+        ntsi = itemgetter(self.index)(copy.copy(node.transition))
+
         self_recursive_link = (
             # The self-recursive link in `self`
-            self_transition_rescale * self.transition[self.index] +
-            # Link from `self` to `node` becomes self-recursive
-            self_transition_rescale * self.transition[node.index] +
-            # The self-recursive link in `node` is transfered to `self`
-            node_transition_rescale * node.transition[node.index] +
-            # Link from `node` to `self` becomes self-recursive
-            node_transition_rescale * node.transition[self.index]
+                ##self_transition_rescale * self.transition[self.index] +
+                self_transition_rescale * stsi +
+                # Link from `self` to `node` becomes self-recursive
+                ##self_transition_rescale * self.transition[node.index] +
+                self_transition_rescale * stni +
+                # The self-recursive link in `node` is transfered to `self`
+                ##node_transition_rescale * node.transition[node.index] +
+                node_transition_rescale * ntni +
+                # Link from `node` to `self` becomes self-recursive
+                ##node_transition_rescale * node.transition[self.index]
+                node_transition_rescale * ntsi
         )
+        print 'merge_transitions 3: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
+
         # Only set the self-recursive link, if a self-recursive link was
         # produced
+
+        print 'self_recursive_link:{}'.format(self_recursive_link)
         if self_recursive_link > 0.0:
             self.transition[self.index] = self_recursive_link
         # Also remove transition to the `node` as this has now become
         # a self-recursive link
+        print 'merge_transitions 4: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
+
         if node.index in self.transition:
             del self.transition[node.index]
+        print 'merge_transitions 5: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
 
         self.num_aggregated_transitions = total_aggregated_transitions
+        print 'merge_transitions 6: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
 
+        print 'total_aggregated_transitions:{}'.format(total_aggregated_transitions)
 
 class CheckGrammaModel(object):
-    root=object
-    end=object
-    nodes=object
-    index_counter=0
+    #root=object
+    #end=object
+    #nodes=object
+    #index_counter=0
 
     def __init__(self):
         self.root = GrammaNode(0, is_root=True)
@@ -260,45 +298,7 @@ class CheckGrammaModel(object):
         return output
 
     def compute_prior_log_prop(self):
-        u"""
-        Compute the baysian prior properbility, denoted P(M).
 
-        In [3, 4] the baysian prior is defined as:
-
-          P(M) = \\prod_{s \\in States} N^(-e_s) * N^(-t_s)
-
-        Note that the notation in [3, 4] is very clumsy and the above equation
-        only makes sense if the start and end states are not treated as
-        emissions.
-
-        The P(M) equation from [3, 4] also has the unfortunete consequence
-        to value states with multiple emissions to high. To improve upon this,
-        consider the multiple emission state:
-
-        ^ -> (A|B) -> $
-
-        This can be expressed as:
-
-           /-> A -\\
-        ^ -+       +> $
-           \\-> B -/
-
-        Extrapolating this to any number of emissions, a state-block like
-        this contains $3 (e_s - 1) + 1 t_s$ transitions and emissions, if
-        e_s and t_s is the number of emissions and transitions for (A|B).
-        The baysian prior is this reformulated as:
-
-          P(M) = \\prod_{s \\in States} N^(-(3 * (e_s - 1) + 1)) * N^(-t_s)
-
-        All those powers and multiplications are not nummerically stable,
-        and quite expensive to compute. To improve both of these issues,
-        the log properbility is computed instead:
-
-          log(P(M)) = \\sum_{s \\in S} log(N)*(-(3*(e_s-1)+1)) + log(N)*(-t_s)
-          log(P(M)) = \\sum_{s \\in S} log(N)*(-(3*(e_s-1)+1) - t_s)
-          log(P(M)) = - \\sum_{s \\in S} log(N)*(3 * (e_s - 1) + 1 + t_s)
-          log(P(M)) = -log(N) \\sum_{s \\in S} (3 * (e_s - 1) + 1 + t_s)
-        """
         connections = sum(
             3 * (len(node.emission) - 1) + 1 + len(node.transition)
             for node in self.nodes.values()
@@ -310,30 +310,6 @@ class CheckGrammaModel(object):
 
     def sequence_solutions(self, tokenized_sequence,                # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                            beam_size=100):
-        u"""
-        Perform a Beam Search to find heuristically the most likely paths.
-
-        A full search of all possible paths often very quite feasible in
-        the final model. However, while searching for the best model, models
-        with cyclic sub-structures may be attempted:
-
-            /- [A] -\\
-        ^ -+   ? ?  +--> $
-            \\- [A] -/
-
-        This means that a sequence (for example, AAAA) will generate an
-        expentionally increasing amount of solutions. To prevent this, a
-        Beam Search heuristic is used.
-
-        A Beam Search maintains a list of the most likely paths found (the
-        amount of paths, is called the "beam size"), and only continues with
-        those paths even if there may be more.
-
-        The idea here is that if a path is already unlikely, it is unlikely
-        (although not impossible, hence the heuristic) that the path will
-        become likely.
-        """
-
         q = Queue.Queue()
         q.put(BeamSearchQueueItem(
             neg_log_p=0.0,
@@ -360,7 +336,7 @@ class CheckGrammaModel(object):
                         emission_p = next_node.emission[next_char]
                         next_q.put(BeamSearchQueueItem(
                             neg_log_p=neg_log_p - math.log(transition_p)
-                                                - math.log(emission_p),
+                                      - math.log(emission_p),
                             node=next_node,
                             path=path + [next_node.index]
                         ))
@@ -458,8 +434,11 @@ class CheckGrammaModel(object):
         return new_node
 
     def merge_node(self, keep_node, remove_node):
+        print 'before merge remove_node.transition.keys:{}, node index:{}'.format(remove_node.transition.keys(),remove_node.index)
         keep_node.merge_emissions(remove_node)
+        print 'after merge emissions remove_node.transition.keys:{}, node index:{}'.format(remove_node.transition.keys(),remove_node.index)
         keep_node.merge_transitions(remove_node)
+        print 'after merge transitions remove_node.transition.keys:{}, node index:{}'.format(remove_node.transition.keys(),remove_node.index)
 
         # Merge the ingoing transitions
         for remove_parent_index in remove_node.parents:
@@ -480,12 +459,14 @@ class CheckGrammaModel(object):
             keep_node.parents.add(remove_parent_index)
 
         # Redirect the `parent` of the removed node children.
+        print 'remove_node.transition.keys:{}, node index:{}'.format(remove_node.transition.keys(),remove_node.index)
+
         for child_index in remove_node.transition.keys():
             # Skip the self-recursive link
             if child_index == remove_node.index:
                 continue
-
             child_node = self.nodes[child_index]
+            print 'child_index in remove_node  child_index:{}: remove_node.index:{} child_node.par:{}'.format(child_index, remove_node.index, child_node.parents)
             child_node.parents.remove(remove_node.index)
             child_node.parents.add(keep_node.index)
 
@@ -557,6 +538,8 @@ class CheckGrammaModel(object):
             if not suggested_merge_node.allow_merge:
                 continue
 
+            print 'compute_merge_cost  {}: dataset:{} node:{}'.format(suggested_merge_node.index, dataset, node.index)
+            print 'compute_merge_cost2 node.transition {}'.format(node.transition.keys())
             suggested_model_cost = self.compute_merge_cost(
                 suggested_merge_node, node, dataset
             )
@@ -569,8 +552,12 @@ class CheckGrammaModel(object):
 
     def merge_sequence(self, tokenized_sequence,                                        # ==================================
                        dataset):
+
+        print 'merge_sequence  {}: {}'.format(tokenized_sequence, dataset)
         # Fast path
         solutions = self.sequence_solutions(tokenized_sequence)
+        print 'solutions  : {}'.format(len(solutions))
+
         if len(solutions) > 0:
             # If tokenized_sequence is allready representable by the network.
             # If so, a more complex network won't benfit because of P(M) and
@@ -583,9 +570,9 @@ class CheckGrammaModel(object):
 
             # increment transition and emission along the path
             for prev_node_index, this_node_index, char in izip(
-                best_solution.path[:-2],
-                best_solution.path[1:-1],
-                tokenized_sequence
+                    best_solution.path[:-2],
+                    best_solution.path[1:-1],
+                    tokenized_sequence
             ):
                 prev_node = self.nodes[prev_node_index]
                 this_node = self.nodes[this_node_index]
@@ -601,6 +588,7 @@ class CheckGrammaModel(object):
         else:
             # Slow path
             unmerged_nodes = self.add_unmerged_sequence(tokenized_sequence)
+            print 'unmerged_nodes  : {}'.format(len(unmerged_nodes))
             merge_nodes = set()
             for node in unmerged_nodes:
                 best_merge_node = self.find_optimal_merge(node, dataset)
@@ -622,12 +610,12 @@ class CheckGrammaModel(object):
                 # If the two nodes links to themself and each other and
                 # a merge is allowed. Try merging them together:
                 if (
-                    node_a.allow_merge and
-                    node_b.allow_merge and
-                    node_a.index in node_a.transition and
-                    node_a.index in node_a.transition and
-                    node_b.index in node_b.transition and
-                    node_a.index in node_b.transition
+                        node_a.allow_merge and
+                        node_b.allow_merge and
+                        node_a.index in node_a.transition and
+                        node_a.index in node_a.transition and
+                        node_b.index in node_b.transition and
+                        node_a.index in node_b.transition
                 ):
                     suggested_model_cost = self.compute_merge_cost(
                         node_a, node_b, dataset
@@ -640,14 +628,16 @@ class CheckGrammaModel(object):
 
 def train(sequences, verbose=False):
     if verbose:
-        print u'Training GrammaModel with {len(sequences)} sequences'
+        #print 'Training GrammaModel with {len(sequences)} sequences'.format(len(sequences)
+        print 'Training GrammaModel with  {}: {}'.format(len(sequences), sequences)
     model = CheckGrammaModel()
 
     # Add remaining sequences by merge
     tokenized_sequences = []
     for i, sequence in enumerate(sequences):
         if verbose:
-            print u'  {i}: {sequence}'
+            #print u'  {i}: {sequence}'
+            print '  {}: {}'.format(i, sequence)
         tokenized_sequence = tokenize(sequence)
         tokenized_sequences.append(tokenized_sequence)
         model.merge_sequence(tokenized_sequence, tokenized_sequences)

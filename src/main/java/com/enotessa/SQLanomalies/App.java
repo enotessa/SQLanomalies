@@ -1,13 +1,23 @@
 package com.enotessa.SQLanomalies;
 
+import com.enotessa.SQLanomalies.grigorov.MainClassGrigorov;
+import com.enotessa.SQLanomalies.grigorov.ScriptRunner;
 import com.enotessa.SQLanomalies.mutz.CheckDistribution;
 import com.enotessa.SQLanomalies.mutz.CheckLength;
 import com.enotessa.SQLanomalies.mutz.CheckToken;
 import com.enotessa.SQLanomalies.persistence.HibernateUtil;
 import org.hibernate.Session;
+import org.python.core.PyInteger;
+import org.python.core.PyList;
+import org.python.core.PyObject;
+import org.python.core.PyString;
+import org.python.util.PythonInterpreter;
 
-import java.io.FileReader;
+import java.io.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class App
 {
@@ -16,6 +26,7 @@ public class App
     static Scanner in = new Scanner(System.in);
     static FileReader fileWithQueries;
     static ReadSQL readSQL;
+    static PythonInterpreter interp = new PythonInterpreter();
 
     public static void main(String[] args) throws Exception
     {
@@ -60,45 +71,23 @@ public class App
         //CheckGramma checkGramma = new CheckGramma();
         CheckToken checkToken =new CheckToken();
         System.out.println("Введите проверяемую строку");
-        //String str = in.nextLine();
-        String str = "UPDATE owner SET patron = \"Игоревич\" WHERE tel = \"89527356477\";";
+        //String query = in.nextLine();
+        String query = "UPDATE owner SET patron = \"Игоревич\" WHERE tel = \"89527356477\";";
 
-        checkLength.train(readSQL.arrayList);
-        System.out.println("Проверка на длину строки : " + checkLength.validate(str));
+        /*checkLength.train(readSQL.arrayList);
+        System.out.println("Проверка на длину строки : " + checkLength.validate(query));
 
         checkDistribution.train(readSQL.arrayList);
-        System.out.println("Проверка на распределение символов строки : " + checkDistribution.validate(str));
+        System.out.println("Проверка на распределение символов строки : " + checkDistribution.validate(query));
 
         //checkGramma.train(readSQL.arrayList);
 
         checkToken.train(readSQL.arrayList);
+        System.out.println("Проверка токенов. независимая модель : " + checkToken.validate(query));*/
 
 
-
-        /*
-        ВСТАВКА В БД
-
-        Therapy therapy = new Therapy();
-        therapy.setId_therapy(500017);
-        therapy.setDescription("курс Bayer");
-        session.save(therapy);
-        session.getTransaction().commit();*/
-
-        /*
-        ЗАПРОС SELECT в БД
-
-        Query query = session.createSQLQuery("SELECT * FROM vetclinic.doctor;").addEntity(Doctor.class);
-        List<Doctor> doctors = query.list();
-
-        System.out.println("users.size = " + doctors.size());
-        for (Iterator<Doctor> it = doctors.iterator(); it.hasNext();) {
-            Doctor doctor = (Doctor) it.next();
-            System.out.println(doctor.toString());
-        }*/
-
-        /*Scanner in = new Scanner(System.in);
-        System.out.println("Введите запрос");
-        query = in.nextLine();
-        System.out.println("Введено");*/
+        MainClassGrigorov mainClassGrigorov = new MainClassGrigorov(session);
+        mainClassGrigorov.methodRun(query);
     }
+
 }

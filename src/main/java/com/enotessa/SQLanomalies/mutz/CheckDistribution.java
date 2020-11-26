@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
  */
 public class CheckDistribution {
     double countAllChars = 0;
+    double threshold;
 
     HashMap<Character, Double> collapsСhars = new HashMap<>(); // для подсчета символов
     HashMap<Character, Double> frequencies = new HashMap();
@@ -62,7 +63,7 @@ public class CheckDistribution {
 
         //sortedGlobalFrequencies.entrySet().forEach(System.out::println);
         //System.out.println(sortedGlobalFrequencies.size());
-        int k=0;
+        int k = 0;
         // делим вероятности на интервалы
         for (Map.Entry<Character, Double> pair : sortedGlobalFrequencies.entrySet()) {
             double value = pair.getValue();
@@ -70,50 +71,67 @@ public class CheckDistribution {
             if (value < 0.0005) {
                 intervals.set(0, intervals.get(0) + value);
                 k++;
-            }
-            else if (value < 0.001) {
+            } else if (value < 0.001) {
                 if (F) {
-                    intervals.set(0, intervals.get(0)/k);
-                    k=0;
-                    F= false;
+                    intervals.set(0, intervals.get(0) / k);
+                    k = 0;
+                    F = false;
                 }
                 intervals.set(1, intervals.get(1) + value);
                 k++;
-            }
-            else if (value < 0.005) {
+            } else if (value < 0.005) {
                 if (!F) {
-                    intervals.set(1, intervals.get(1)/k);
-                    k=0;
-                    F= true;
+                    intervals.set(1, intervals.get(1) / k);
+                    k = 0;
+                    F = true;
                 }
                 intervals.set(2, intervals.get(2) + value);
                 k++;
-            }
-            else if (value < 0.09) {
+            } else if (value < 0.09) {
                 if (F) {
-                    intervals.set(2, intervals.get(2)/k);
-                    k=0;
-                    F= false;
+                    intervals.set(2, intervals.get(2) / k);
+                    k = 0;
+                    F = false;
                 }
                 intervals.set(3, intervals.get(3) + value);
                 k++;
-            }
-            else {
+            } else {
                 if (!F) {
-                    intervals.set(3, intervals.get(3)/k);
-                    k=0;
-                    F= true;
+                    intervals.set(3, intervals.get(3) / k);
+                    k = 0;
+                    F = true;
                 }
                 intervals.set(4, intervals.get(4) + value);
                 k++;
             }
         }
-        intervals.set(4, intervals.get(4)/k);
-        k=0;
+        intervals.set(4, intervals.get(4) / k);
+        findingThreshold(sequences);
+        //System.out.println("threshold = "+threshold);
     }
 
+    void findingThreshold(ArrayList<String> sequences) {
+        threshold = 0;
+        double p;
+        for (String str : sequences) {
+            p = probability(str);
+            if (threshold == 0)
+                threshold = p;
+            else if (threshold < p) {
+                threshold = p;
+            }
+        }
+    }
+
+    double probability(String sequence) {
+        // Построить частотный массив для данной строки
+        HashMap<Character, Double> frequency = new HashMap<>();
+        frequency = computeUnorderedFrequency(sequence);
+        return chiSquareTest(frequency, sortedGlobalFrequencies, sequence.length());
+    }
+
+
     public boolean validate(String sequence) {
-        double threshold = 4000;
         // Построить частотный массив для данной строки
         HashMap<Character, Double> frequency = new HashMap<>();
         frequency = computeUnorderedFrequency(sequence);
@@ -123,10 +141,8 @@ public class CheckDistribution {
                 return false;
             }
         }
-
         // Сравнить входную последовательность с опорной частотой
         double p = chiSquareTest(frequency, sortedGlobalFrequencies, sequence.length());
-        System.out.println(p);
         return p < threshold;
     }
 

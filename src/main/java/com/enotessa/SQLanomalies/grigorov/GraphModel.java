@@ -1,9 +1,18 @@
 package com.enotessa.SQLanomalies.grigorov;
 
+import com.mxgraph.layout.mxCircleLayout;
+import com.mxgraph.layout.mxIGraphLayout;
+import com.mxgraph.util.mxCellRenderer;
 import org.jgrapht.Graph;
+import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -21,12 +30,41 @@ public class GraphModel {
      * @param dataAfterQuery запрос для получения данных из таблиц
      * @return граф GT
      */
-    Graph<ArrayList, DefaultEdge> createArrayListGraph(ArrayList<ArrayList> dataAfterQuery) throws ParseException {
+    Graph<ArrayList, DefaultEdge> createArrayListGraph(ArrayList<ArrayList> dataAfterQuery) throws ParseException, IOException {
+        File imgFile = new File("src/main/resources/graph.png");
+        imgFile.createNewFile();
+        Graph<String, DefaultEdge> g =
+                new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
+
+
+
         Graph<ArrayList, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
         typeOfColumns = typeOfColumns(dataAfterQuery.get(0));
         dataAfterQuery.forEach(graph::addVertex);
+
+        dataAfterQuery.forEach(v -> g.addVertex(v.toString()));
+
+
         minMaxKnowledgeModule.minMax(dataAfterQuery, graph, typeOfColumns);
         //graph.vertexSet().forEach(System.out::println);
+
+
+        for (int i=0; i<dataAfterQuery.size(); i++){
+            for (int j=0; j<dataAfterQuery.size(); j++){
+                if (graph.containsEdge(dataAfterQuery.get(i), dataAfterQuery.get(j))){
+                    g.addEdge(dataAfterQuery.get(i).toString(), dataAfterQuery.get(j).toString());
+                }
+            }
+        }
+        JGraphXAdapter<String, DefaultEdge> graphAdapter =
+                new JGraphXAdapter<String, DefaultEdge>(g);
+        mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
+        layout.execute(graphAdapter.getDefaultParent());
+
+
+        BufferedImage image =
+                mxCellRenderer.createBufferedImage(graphAdapter, null, 2, Color.BLACK, true, null);
+        ImageIO.write(image, "PNG", imgFile);
 
         return graph;
     }

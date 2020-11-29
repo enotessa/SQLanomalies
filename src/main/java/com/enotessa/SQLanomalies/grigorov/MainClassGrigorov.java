@@ -3,6 +3,7 @@ package com.enotessa.SQLanomalies.grigorov;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultEdge;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -32,7 +33,7 @@ public class MainClassGrigorov {
      *
      * @param queryStr запрос
      */
-    public void methodRun(String queryStr) throws ParseException {
+    public void methodRun(String queryStr) throws ParseException, IOException {
         String queryForSelectData = createQueryForSelectData(queryStr);
         assert connection != null;
 

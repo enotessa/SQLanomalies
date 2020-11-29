@@ -142,8 +142,8 @@ public class MinMaxKnowledgeModule {
                             if (record.get(j).equals(dataAfterQuery.get(i).get(j))){
                                 for (int k=0; k<record.size(); k++){
                                     if (typeOfColumns.get(k).equals(TypeOfAttribute.STRING)){
-                                        if (record.get(k).toString().length()>topBound.get(i).get(k).toString().length()){
-                                            topBound.get(i).set(k, record.get(k).toString().length());
+                                        if (record.get(k).toString().length()>topBound.get(i).get(k).toString().length()-5){
+                                            topBound.get(i).set(k, record.get(k).toString().length()+5);
                                         }
                                     }
                                 }
@@ -209,8 +209,8 @@ public class MinMaxKnowledgeModule {
                             if (record.get(j).equals(dataAfterQuery.get(i).get(j))){    //TODO проверка на одну и ту же запись
                                 for (int k=0; k<record.size(); k++){
                                     if (typeOfColumns.get(k).equals(TypeOfAttribute.STRING)){
-                                        if (record.get(k).toString().length()<dataAfterQuery.get(i).get(k).toString().length()){   //TODO dataAfterQuery заменить на bottomBound
-                                            bottomBound.get(i).set(k, record.get(k).toString().length());
+                                        if (record.get(k).toString().length()<dataAfterQuery.get(i).get(k).toString().length()+5){   //TODO dataAfterQuery заменить на bottomBound
+                                            bottomBound.get(i).set(k, record.get(k).toString().length()-5);
                                         }
                                     }
                                 }

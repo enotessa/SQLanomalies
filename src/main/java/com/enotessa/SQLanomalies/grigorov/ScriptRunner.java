@@ -1,36 +1,69 @@
 package com.enotessa.SQLanomalies.grigorov;
 
-import org.hibernate.Session;
+import org.python.antlr.ast.Str;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import java.sql.SQLException;
-import java.util.List;
+import java.sql.*;
+import java.util.ArrayList;
 
 public class ScriptRunner {
-    private EntityManager entityManager;
-    Session session;
+    private ResultSet rs;
+    Connection connection = null;
+    private int qountColumns;
+    Statement stmt;
 
-    public ScriptRunner(Session session) {
-        this.session = session;
+    public ScriptRunner(Connection connection, Statement stmt) {
+        this.stmt = stmt;
+        this.connection = connection;
     }
 
-    public void runScript(String queryStr) throws SQLException {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("com.enotessa.SQLanomalies");
-        entityManager = emf.createEntityManager();
-
-        entityManager.getTransaction().begin();
-
-        List<Object[]> results = entityManager.createQuery(queryStr).getResultList();
-
-        for (Object[] result : results) {
-            for (int i = 0; i < results.size(); i++)
-                System.out.print(result[i] + " ");
-            System.out.println("\n");
+    /**
+     * выполнить запрос пользователя
+     *
+     * @param queryStr запрос
+     */
+    public void runScript(String queryStr){
+        String output;
+        try {
+            output="\n";
+            rs = stmt.executeQuery(queryStr);
+            ResultSetMetaData rsmd = rs.getMetaData();
+            qountColumns = rsmd.getColumnCount();
+            while (rs.next()) {
+                for (int i = 1; i < qountColumns; i++) {
+                    output +=rs.getString(i) + " : ";
+                }
+                output +=rs.getString(qountColumns) + "\n";
+            }
+            System.out.println(output);
+            rs.close();
+        } catch (SQLException e) {
+            System.out.println("Нет достаточных привелегий");
         }
+    }
 
-        entityManager.getTransaction().commit();
-        entityManager.close();
+    /**
+     * получить таблицу с данными
+     *
+     * @param queryForGetData запрос для получения данных из таблиц
+     * @return таблица с данными
+     */
+    ArrayList<ArrayList> getDataFromTable(String queryForGetData){
+        ArrayList<ArrayList> data = new ArrayList<>();
+        String output;
+        try {
+            rs = stmt.executeQuery(queryForGetData);
+            ResultSetMetaData rsmd = rs.getMetaData();
+            qountColumns = rsmd.getColumnCount();
+            while (rs.next()) {
+                data.add(new ArrayList());
+                for (int i = 1; i <= qountColumns; i++) {
+                    data.get(data.size()-1).add(rs.getString(i));
+                }
+            }
+            rs.close();
+        } catch (SQLException e) {
+            System.out.println("Нет достаточных привелегий");
+        }
+        return data;
     }
 }

@@ -1,23 +1,16 @@
 package com.enotessa.SQLanomalies;
 
 import com.enotessa.SQLanomalies.grigorov.MainClassGrigorov;
-import com.enotessa.SQLanomalies.grigorov.ScriptRunner;
 import com.enotessa.SQLanomalies.mutz.CheckDistribution;
 import com.enotessa.SQLanomalies.mutz.CheckLength;
 import com.enotessa.SQLanomalies.mutz.CheckToken;
-import com.enotessa.SQLanomalies.persistence.HibernateUtil;
-import org.hibernate.Session;
-import org.python.core.PyInteger;
-import org.python.core.PyList;
-import org.python.core.PyObject;
-import org.python.core.PyString;
 import org.python.util.PythonInterpreter;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 public class App
 {
@@ -30,40 +23,21 @@ public class App
 
     public static void main(String[] args) throws Exception
     {
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        session.beginTransaction();
-        System.out.println("Введите роль");
-        //String r = in.nextLine();
-        String r="r1";
-        switch (r){
-            case "r1":
-                role = Roles.ADMIN;
-                fileWithQueries = new FileReader("C:\\Users\\Admin\\IdeaProjects\\SQLanomalies\\src\\main\\resources\\queries.txt");
-                //fileWithQueries = new FileReader("ADMINqueries.txt");
-                break;
+        Connection connection = null;
+        System.out.println("логин");
+        String login = "Admin";
+        //String login = in.nextLine();
+        System.out.println("пароль");
+        String password = "Admin";
+        //String password = in.nextLine();
+        try {
+            connection = getConnection(login, password);       // подсоединение к бд
 
-            case "r2":
-                role = Roles.REGISTRY;
-                fileWithQueries = new FileReader("REGISTRYqueries.txt");
-                break;
-
-            case "r3":
-                role = Roles.DOCTOR;
-                fileWithQueries = new FileReader("DOCTORqueries.txt");
-                break;
-
-            case "r4":
-                role = Roles.VISITOR;
-                fileWithQueries = new FileReader("VISITORqueries.txt");
-                break;
-
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        System.out.println("!!!");
+        fileWithQueries = new FileReader("C:\\Users\\Admin\\IdeaProjects\\SQLanomalies\\src\\main\\resources\\queries.txt");
         readSQL = new ReadSQL(fileWithQueries);
-
-        for (String str : readSQL.arrayList){
-            System.out.println(str);
-        }
 
 
         CheckLength checkLength = new CheckLength();
@@ -72,7 +46,7 @@ public class App
         CheckToken checkToken =new CheckToken();
         System.out.println("Введите проверяемую строку");
         //String query = in.nextLine();
-        String query = "UPDATE owner SET patron = \"Игоревич\" WHERE tel = \"89527356477\";";
+        String query = "SELECT count(id_pet) AS count_pet_from_Moscow FROM pet NATURAL JOIN owner WHERE owner.address REGEXP \"г.Тверь\" = 1;";
 
         /*checkLength.train(readSQL.arrayList);
         System.out.println("Проверка на длину строки : " + checkLength.validate(query));
@@ -85,9 +59,40 @@ public class App
         checkToken.train(readSQL.arrayList);
         System.out.println("Проверка токенов. независимая модель : " + checkToken.validate(query));*/
 
-
-        MainClassGrigorov mainClassGrigorov = new MainClassGrigorov(session);
+        MainClassGrigorov mainClassGrigorov = new MainClassGrigorov(connection);
         mainClassGrigorov.methodRun(query);
+
+
+
+
+
+
+    }
+
+    /**
+     * получение соединения с БД
+     *
+     * @param login логин
+     * @param password пароль
+     * @return объект Connection
+     */
+    private static Connection getConnection(String login, String password) throws SQLException {
+        String URL = "jdbc:mysql://localhost:3306/vetClinic";
+        switch (login) {
+            case "Admin":
+                role = Roles.ADMIN;
+                break;
+            case "Registry":
+                role = Roles.REGISTRY;
+                break;
+            case "Doctor":
+                role = Roles.DOCTOR;
+                break;
+            case "Visitor":
+                role = Roles.VISITOR;
+                break;
+        }
+        return DriverManager.getConnection(URL, login, password);
     }
 
 }

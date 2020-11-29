@@ -16,6 +16,11 @@ public class CheckDistribution {
     HashMap<Character, Double> sortedGlobalFrequencies = new HashMap<>();
     ArrayList<Double> intervals = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0));
 
+    /**
+     * Подсчет количества вхождений для каждого символа во всех обучающих запросах
+     *
+     * @param sequence запрос
+     */
     public void fillCollapsСhars(String sequence) { // Подсчет количества вхождений для каждого символа
         char ch;
         for (int i = 0; i < sequence.length(); i++) {
@@ -26,8 +31,13 @@ public class CheckDistribution {
         }
     }
 
+    /**
+     * Подсчет количества вхождений для каждого символа в строке
+     *
+     * @param sequence запрос
+     * @return отображение "символ" -> "его количество"
+     */
     public HashMap<Character, Double> computeUnorderedFrequency(String sequence) {
-        // Подсчет количества вхождений для каждого символа
         HashMap<Character, Double> frequency = new HashMap<>();
         char ch;
         for (int i = 0; i < sequence.length(); i++) {
@@ -39,6 +49,11 @@ public class CheckDistribution {
         return frequency;
     }
 
+    /**
+     * тренировка модели "Распределение символов строки"
+     *
+     * @param sequences запросы для обучения
+     */
     public void train(ArrayList<String> sequences) {
         // Заполняем collapsСhars, т.е. считаем количество каждых символов
         for (String sequence : sequences) {
@@ -110,6 +125,11 @@ public class CheckDistribution {
         //System.out.println("threshold = "+threshold);
     }
 
+    /**
+     * определение границы аномальности
+     *
+     * @param sequences массив запросов
+     */
     void findingThreshold(ArrayList<String> sequences) {
         threshold = 0;
         double p;
@@ -123,14 +143,26 @@ public class CheckDistribution {
         }
     }
 
+    /**
+     * вычисление вероятности
+     *
+     * @param sequence запрос
+     * @return вероятность
+     */
     double probability(String sequence) {
-        // Построить частотный массив для данной строки
+        // построить частотный массив для данной строки
         HashMap<Character, Double> frequency = new HashMap<>();
         frequency = computeUnorderedFrequency(sequence);
         return chiSquareTest(frequency, sortedGlobalFrequencies, sequence.length());
     }
 
 
+    /**
+     * обнаружение аномалий по модели "Распределение символов строки"
+     *
+     * @param sequence запрос
+     * @return true - нормальный, false - аномальный
+     */
     public boolean validate(String sequence) {
         // Построить частотный массив для данной строки
         HashMap<Character, Double> frequency = new HashMap<>();
@@ -150,6 +182,14 @@ public class CheckDistribution {
         return Math.pow(observedValue - expectedValue, 2) / expectedValue;
     }
 
+    /**
+     * хи квадрат тест
+     *
+     * @param observed наблюдаемая
+     * @param expected  ожидаемая
+     * @param sequenceLength длина последовательности
+     * @return вероятность
+     */
     public double chiSquareTest(HashMap<Character, Double> observed, HashMap<Character, Double> expected, int sequenceLength) {
         double p = 0, expectedValue = 0, observedValue = 0;
         for (Map.Entry<Character, Double> pair : expected.entrySet()) {

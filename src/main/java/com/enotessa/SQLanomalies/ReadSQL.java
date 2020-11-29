@@ -14,6 +14,10 @@ public class ReadSQL {
         readFile();
     }
 
+    /**
+     * прочитать файл с запросами и поместить их в массив
+     *
+     */
     void readFile() {
         int n = 0;
         BufferedReader reader = new BufferedReader(file);

@@ -17,6 +17,11 @@ public class CheckToken {
     HashMap<String, ArrayList<String>> tokensCopy = new HashMap<>();
     HashMap<String, Double> probabilities;
 
+    /**
+     * тренировка модели "Поиск токенов. независимая модель"
+     *
+     * @param sequences запросы для обучения
+     */
     public void train(ArrayList<String> sequences) {
         for (String sequence : sequences)
             token(sequence);
@@ -70,7 +75,12 @@ public class CheckToken {
     }*/
 
 
-
+    /**
+     * обнаружение аномалий по модели "Поиск токенов. независимая модель"
+     *
+     * @param sequence запрос
+     * @return true - нормальный, false - аномальный
+     */
     public boolean validate(String sequence) {
         double threshold = 0.563;
         HashMap<String, ArrayList<String>> tokensSequence = new HashMap<>();
@@ -121,7 +131,14 @@ public class CheckToken {
         return probability*Math.sqrt(K);
     }*/
 
-
+    /**
+     * статистический тест Колмогорова-Смирнова
+     *
+     * @param sequences запросы
+     * @param key атрибут
+     * @param K всего найдено данных литералов
+     * @return вероятность
+     */
     double probabilityForTrain(ArrayList<String> sequences, String key,double K){
         double k=0;
         double N=0;
@@ -164,6 +181,11 @@ public class CheckToken {
         return max*Math.sqrt(K);
     }
 
+    /**
+     * токенизация
+     *
+     * @param sequence запросы
+     */
     void token(String sequence){
         String result = sequence;
         String regex = "(([^ .]*)( (=|>=|<=|<|>|LIKE) )([^ (]*)( |;))";

@@ -1,15 +1,12 @@
 package com.enotessa.SQLanomalies.grigorov;
 
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Класс, оценивающий результирующее множество, строя граф по правилу "MinMax".
@@ -22,7 +19,7 @@ public class MinMaxKnowledgeModule {
     ArrayList<TypeOfAttribute> typeOfColumns = new ArrayList<>();
     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
-    void minMax(ArrayList<ArrayList> dataAfterQuery, Graph<ArrayList, DefaultEdge> graph, ArrayList<TypeOfAttribute> typeOfColumns) throws ParseException {
+    void minMax(ArrayList<ArrayList> dataAfterQuery, Graph<ArrayList, DefaultWeightedEdge> graph, ArrayList<TypeOfAttribute> typeOfColumns) throws ParseException {
         this.typeOfColumns = typeOfColumns;
         // находим верхнюю и нижнюю границы значений
         topBound = getTopBound(dataAfterQuery);
@@ -37,12 +34,14 @@ public class MinMaxKnowledgeModule {
 
         for (int i=0; i< dataAfterQuery.size(); i++){
             for (int j = 0; j<dataAfterQuery.size(); j++){
-                if (isRelations(i,j, dataAfterQuery)){
-                    graph.addEdge(dataAfterQuery.get(i), dataAfterQuery.get(j));
-                }
+                if (isRelations(i,j, dataAfterQuery)) graph.addEdge(dataAfterQuery.get(i), dataAfterQuery.get(j));
+
+                /*DefaultWeightedEdge e = graph.addEdge(dataAfterQuery.get(i), dataAfterQuery.get(j));
+                if (isRelations(i,j, dataAfterQuery))
+                    graph.setEdgeWeight(e, 1);
+                else graph.setEdgeWeight(e, 0);*/
             }
         }
-        System.out.println("\n");
 
     }
 

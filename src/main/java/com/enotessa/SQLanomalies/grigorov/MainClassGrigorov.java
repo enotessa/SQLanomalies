@@ -1,7 +1,7 @@
 package com.enotessa.SQLanomalies.grigorov;
 
 import org.jgrapht.Graph;
-import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.DefaultWeightedEdge;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -33,7 +33,8 @@ public class MainClassGrigorov {
      *
      * @param queryStr запрос
      */
-    public void methodRun(String queryStr) throws ParseException, IOException {
+    public boolean methodRun(String queryStr) throws ParseException, IOException {
+        double alpha = 0.25;
         String queryForSelectData = createQueryForSelectData(queryStr);
         assert connection != null;
 
@@ -43,8 +44,11 @@ public class MainClassGrigorov {
         System.out.println("\n");
 
         GraphModel graphModel = new GraphModel();
-        Graph<ArrayList, DefaultEdge> graph = graphModel.createArrayListGraph(dataAfterQuery);
-
+        Graph<ArrayList, DefaultWeightedEdge> graph = graphModel.createGraph(dataAfterQuery);
+        double density = densityGraph(graph);
+        if (density>alpha)
+            return true;
+        else return false;
     }
 
     /**
@@ -80,6 +84,22 @@ public class MainClassGrigorov {
             }
         }
         return query.toString();
+    }
+
+    /**
+     * вычислить плотность графа
+     *
+     * @param graph граф
+     * @return плотность графа
+     */
+    private double densityGraph(Graph<ArrayList, DefaultWeightedEdge> graph) {
+        double density = 0;
+        System.out.println(graph.edgeSet().size());
+        System.out.println(graph.vertexSet().size()*(graph.vertexSet().size()-1));
+        density = graph.edgeSet().size();
+        density = density / (graph.vertexSet().size()*graph.vertexSet().size()-1);
+
+        return density;
     }
 
 

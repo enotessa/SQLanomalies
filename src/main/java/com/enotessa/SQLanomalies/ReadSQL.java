@@ -4,19 +4,17 @@ import java.io.*;
 import java.util.ArrayList;
 
 public class ReadSQL {
-    FileReader file;
-    public ArrayList<String> arrayList = new ArrayList();
-
     public ReadSQL() throws IOException {
-        readFile();
     }
 
     /**
      * прочитать файл с запросами и поместить их в массив
      */
-    void readFile() throws IOException {
+    ArrayList<String> readFile(String file) throws IOException {
+        ArrayList<String> arrayList = new ArrayList();
         int n = 0;
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("C:\\Users\\Admin\\IdeaProjects\\SQLanomalies\\src\\main\\resources\\queries.txt"), "UTF-8"));
+        System.out.println(file);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("C:\\Users\\Admin\\IdeaProjects\\SQLanomalies\\src\\main\\resources\\"+file), "UTF-8"));
 
         //BufferedReader reader = new BufferedReader(file);
         // считаем сначала первую строку
@@ -35,6 +33,7 @@ public class ReadSQL {
             // считываем остальные строки в цикле
             line = reader.readLine();
         }
+        return arrayList;
     }
 
 }

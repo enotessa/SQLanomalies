@@ -3,6 +3,7 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/enotessa/SQLanomalies/MainFrame.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/queriesForTest.txt" charset="UTF-8" />
     <file url="PROJECT" charset="windows-1251" />
   </component>
 </project>

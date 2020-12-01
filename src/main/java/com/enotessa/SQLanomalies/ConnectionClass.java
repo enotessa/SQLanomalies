@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 public class ConnectionClass {
     static private Roles role;
+    public Connection connection;
 
     /**
      * получение соединения с БД
@@ -16,7 +17,7 @@ public class ConnectionClass {
      * @param password пароль
      * @return объект Connection
      */
-    static Connection getConnection(String login, String password) throws SQLException {
+    public ConnectionClass(String login, String password) throws SQLException {
         String URL = "jdbc:mysql://localhost:3306/vetClinic";
         switch (login) {
             case "Admin":
@@ -32,6 +33,6 @@ public class ConnectionClass {
                 role = Roles.VISITOR;
                 break;
         }
-        return DriverManager.getConnection(URL, login, password);
+        connection = DriverManager.getConnection(URL, login, password);
     }
 }

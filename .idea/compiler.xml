@@ -12,7 +12,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="SQLanomalies" options="-parameters" />
+      <module name="SQLanomalies" options="" />
     </option>
   </component>
 </project>

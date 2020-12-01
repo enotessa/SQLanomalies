@@ -75,3 +75,63 @@ GROUP BY diagnosis.id_diagnosis HAVING diagnosis.id_diagnosis = a1.id_diagnosis)
 FROM app_dia AS a1 NATURAL JOIN diagnosis NATURAL JOIN appointment WHERE id_appointment = 600004;
 
 SELECT pet.name_pet FROM appointment NATURAL JOIN doctor AS doc NATURAL JOIN pet WHERE EXISTS (SELECT lname_d FROM doctor WHERE lname_d =doc.lname_d AND lname_d = 'Ермаков');
+
+SELECT date_app FROM appointment NATURAL JOIN doctor where doctor.lname_d="Чернов";
+
+SELECT tel_d FROM doctor where lname_d="Громов";
+
+INSERT INTO appointment VALUES
+(600010, '2020-12-03', 200001, 300002),
+(600011, '2020-10-15', 200004, 300003),
+(600012, '2020-09-21', 200005, 300003);
+
+DELETE FROM appointment WHERE id_appointment = 600012;
+
+UPDATE pet SET name_pet = "Инна" WHERE id_pet = 200006;
+
+SELECT lname, name, patron FROM owner NATURAL JOIN pet NATURAL JOIN appointment NATURAL JOIN doctor WHERE doctor.lname_d="Ермаков";
+
+SELECT count(date_app) FROM appointment WHERE date_app >= '2019-01-19' AND date_app <= '2019-04-01';
+
+SELECT description FROM therapy NATURAL JOIN dia_th NATURAL JOIN diagnosis WHERE name_dia = "ринит";
+
+SELECT name_dia FROM diagnosis NATURAL JOIN app_dia NATURAL JOIN appointment NATURAL JOIN pet WHERE name_pet = "Охра";
+
+SELECT lname_d, name_d, patron_d, tel_d FROM doctor;
+
+UPDATE doctor SET tel_d = "89632635454" WHERE lname_d = "Ермаков";
+
+SELECT N_cabinet, lname_d FROM doctor NATURAL JOIN appointment WHERE date_app = "2019-05-24";
+
+UPDATE owner SET tel = "89463746655" WHERE id_owner = 100001;
+
+DELETE FROM appointment WHERE id_appointment = 600011;
+
+INSERT INTO diagnosis VALUES
+(400011, "бруцеллез", "незначительное повышение температуры тела, вялость, снижение аппетита");
+
+SELECT id_pet, name_pet FROM pet NATURAL JOIN appointment NATURAL JOIN app_dia NATURAL JOIN diagnosis WHERE diagnosis.name_dia = "ринит";
+
+SELECT tel FROM owner NATURAL JOIN pet WHERE pet.name_pet = "Мерида";
+
+SELECT appointment.date_app FROM owner NATURAL JOIN pet NATURAL JOIN appointment WHERE id_owner = 100003;
+
+DELETE FROM diagnosis WHERE id_diagnosis = 400011;
+
+SELECT lname_d, name_d, patron_d FROM doctor NATURAL JOIN app_dia NATURAL JOIN appointment NATURAL JOIN diagnosis WHERE diagnosis.name_dia = "cтригущий лишай";
+
+INSERT INTO pet VALUES
+(200010, "Раф", '2010-10-10', "собака", "лабрадор", "м" , 100000),
+(200011, "Мифида", '2015-09-21', "кошка", "персидская", "ж" , 100003);
+
+SELECT distinct name_pet FROM pet NATURAL JOIN appointment WHERE EXISTS(SELECT id_appointment FROM appointment);
+
+SELECT name_pet FROM pet;
+
+INSERT INTO owner VALUES
+(100005, "Металлин", "Андрей", "Викторович", "г.Ростов, ул.Грачева, д.1", "89354627465"),
+(100007, "Швальц", "Дмитрий", "Львович", "г.Москва, ул.Радищева, д.23", "89354625477"),
+(100008, "Ковров", "Сергей", "Михайлович", "г.Москва, ул.Миронова, д.45", "89211234432"),
+(100009, "Гальченко", "Ирина", "Дмитриевна", "г.Тверь, ул.Крылова, д.5", "89008765645");
+
+DELETE FROM owner WHERE id_owner not in (SELECT * FROM (SELECT id_owner FROM owner NATURAL JOIN pet WHERE pet.id_pet) AS t1);

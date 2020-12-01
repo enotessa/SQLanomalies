@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 from __future__ import division
 from __future__ import absolute_import
 import copy
@@ -11,6 +11,9 @@ from itertools import izip
 from collections import namedtuple
 from collections import defaultdict
 from operator import itemgetter
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 collaps_chars = dict()
 collaps_chars.update(dict((char, u'<0-9>') for char in u'0123456789'))
@@ -18,6 +21,9 @@ collaps_chars.update(dict((char, u'<a-f>') for char in u'abcdef'))
 collaps_chars.update(dict((char, u'<A-F>') for char in u'ABCDEF'))
 collaps_chars.update(dict((char, u'<g-z>') for char in u'ghijklmnopqurstuvwxyz'))
 collaps_chars.update(dict((char, u'<G-Z>') for char in u'GHIJKLMNOPQURSTUVWXYZ'))
+collaps_chars.update(dict((char, u'<'+u'\\u0430'.encode('UTF-8')+u'-'+u'\u044f'.encode('UTF-8')+u'>') for char in u'\u0430\u0431\u0432\u0433\u0434\u0435\u0451\u0436\u0437\u0438\u0439\u043a\u043b\u043c\u043d\u043e\u043f\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044c\u044b\u044a\u044d\u044e\u044f'))
+collaps_chars.update(dict((char, u'<'+u'\\u0410'.encode('cp1251')+u'-'+u'\u042f'.encode('UTF-8')+u'>') for char in u'\u0410\u0411\u0412\u0413\u0414\u0415\u0401\u0416\u0417\u0418\u0419\u041a\u041b\u041c\u041d\u041e\u041f\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042c\u042b\u042a\u042d\u042e\u042f'))
+
 
 #GrammaNodeType = typing.TypeVar(u'GrammaNode', bound=u'GrammaNode')
 #KeyType = typing.TypeVar(u'Key')
@@ -203,15 +209,15 @@ class GrammaNode(object):
 
         # Exclude transitions that will become a self-recursive transition
         # when merged. They need to be treated specially.
-        print 'WARN:  self.transition:{}, node.transition:{}, self.index:{}, node.index:{}'.format(self.transition.keys(),node.transition.keys(),self.index,node.index)
+        print u'WARN:  self.transition:{}, node.transition:{}, self.index:{}, node.index:{}'.format(self.transition.keys(),node.transition.keys(),self.index,node.index)
 
         non_self_recursive_transitions = (
             #WARN HERE
                 ( set(self.transition.keys()) | set(node.transition.keys())) -
                 set([self.index, node.index])
         )
-        print 'non_self_recursive_transitions:{}'.format(non_self_recursive_transitions)
-        print 'merge_transitions 1: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
+        print u'non_self_recursive_transitions:{}'.format(non_self_recursive_transitions)
+        print u'merge_transitions 1: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
 
         for index in non_self_recursive_transitions:
             self.transition[index] = (
@@ -220,7 +226,7 @@ class GrammaNode(object):
                     #node_transition_rescale * node.transition[index]
                     node_transition_rescale * itemgetter(index)(copy.copy(node.transition))
             )
-        print 'merge_transitions 2: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
+        print u'merge_transitions 2: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
 
         # For the self-recursive transition, there are a few more links to
         # consider when merging.
@@ -231,10 +237,10 @@ class GrammaNode(object):
         stsi =itemgetter(self.index)(copy.copy(self.transition))
         #stni = copy.copy(self.transition[node.index])
         stni = itemgetter(node.index)(copy.copy(self.transition))
-        print 'ntni before {}'.format(node.transition.keys())
+        print u'ntni before {}'.format(node.transition.keys())
         #ntni = copy.copy(node.transition[node.index])
         ntni = itemgetter(node.index)(copy.copy(node.transition))
-        print 'ntni after {}'.format(node.transition.keys())
+        print u'ntni after {}'.format(node.transition.keys())
 
         #ntsi = copy.deepcopy(node.transition[self.index])
         ntsi = itemgetter(self.index)(copy.copy(node.transition))
@@ -253,26 +259,26 @@ class GrammaNode(object):
                 ##node_transition_rescale * node.transition[self.index]
                 node_transition_rescale * ntsi
         )
-        print 'merge_transitions 3: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
+        print u'merge_transitions 3: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
 
         # Only set the self-recursive link, if a self-recursive link was
         # produced
 
-        print 'self_recursive_link:{}'.format(self_recursive_link)
+        print u'self_recursive_link:{}'.format(self_recursive_link)
         if self_recursive_link > 0.0:
             self.transition[self.index] = self_recursive_link
         # Also remove transition to the `node` as this has now become
         # a self-recursive link
-        print 'merge_transitions 4: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
+        print u'merge_transitions 4: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
 
         if node.index in self.transition:
             del self.transition[node.index]
-        print 'merge_transitions 5: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
+        print u'merge_transitions 5: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
 
         self.num_aggregated_transitions = total_aggregated_transitions
-        print 'merge_transitions 6: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
+        print u'merge_transitions 6: node.transition:{}, node.index:{}'.format(node.transition.keys(),node.index)
 
-        print 'total_aggregated_transitions:{}'.format(total_aggregated_transitions)
+        print u'total_aggregated_transitions:{}'.format(total_aggregated_transitions)
 
 class CheckGrammaModel(object):
     #root=object
@@ -434,11 +440,11 @@ class CheckGrammaModel(object):
         return new_node
 
     def merge_node(self, keep_node, remove_node):
-        print 'before merge remove_node.transition.keys:{}, node index:{}'.format(remove_node.transition.keys(),remove_node.index)
+        print u'before merge remove_node.transition.keys:{}, node index:{}'.format(remove_node.transition.keys(),remove_node.index)
         keep_node.merge_emissions(remove_node)
-        print 'after merge emissions remove_node.transition.keys:{}, node index:{}'.format(remove_node.transition.keys(),remove_node.index)
+        print u'after merge emissions remove_node.transition.keys:{}, node index:{}'.format(remove_node.transition.keys(),remove_node.index)
         keep_node.merge_transitions(remove_node)
-        print 'after merge transitions remove_node.transition.keys:{}, node index:{}'.format(remove_node.transition.keys(),remove_node.index)
+        print u'after merge transitions remove_node.transition.keys:{}, node index:{}'.format(remove_node.transition.keys(),remove_node.index)
 
         # Merge the ingoing transitions
         for remove_parent_index in remove_node.parents:
@@ -459,14 +465,14 @@ class CheckGrammaModel(object):
             keep_node.parents.add(remove_parent_index)
 
         # Redirect the `parent` of the removed node children.
-        print 'remove_node.transition.keys:{}, node index:{}'.format(remove_node.transition.keys(),remove_node.index)
+        print u'remove_node.transition.keys:{}, node index:{}'.format(remove_node.transition.keys(),remove_node.index)
 
         for child_index in remove_node.transition.keys():
             # Skip the self-recursive link
             if child_index == remove_node.index:
                 continue
             child_node = self.nodes[child_index]
-            print 'child_index in remove_node  child_index:{}: remove_node.index:{} child_node.par:{}'.format(child_index, remove_node.index, child_node.parents)
+            print u'child_index in remove_node  child_index:{}: remove_node.index:{} child_node.par:{}'.format(child_index, remove_node.index, child_node.parents)
             child_node.parents.remove(remove_node.index)
             child_node.parents.add(keep_node.index)
 
@@ -538,8 +544,8 @@ class CheckGrammaModel(object):
             if not suggested_merge_node.allow_merge:
                 continue
 
-            print 'compute_merge_cost  {}: dataset:{} node:{}'.format(suggested_merge_node.index, dataset, node.index)
-            print 'compute_merge_cost2 node.transition {}'.format(node.transition.keys())
+            print u'compute_merge_cost  {}: dataset:{} node:{}'.format(suggested_merge_node.index, dataset, node.index)
+            print u'compute_merge_cost2 node.transition {}'.format(node.transition.keys())
             suggested_model_cost = self.compute_merge_cost(
                 suggested_merge_node, node, dataset
             )
@@ -553,10 +559,10 @@ class CheckGrammaModel(object):
     def merge_sequence(self, tokenized_sequence,                                        # ==================================
                        dataset):
 
-        print 'merge_sequence  {}: {}'.format(tokenized_sequence, dataset)
+        print u'merge_sequence  {}: {}'.format(tokenized_sequence, dataset)
         # Fast path
         solutions = self.sequence_solutions(tokenized_sequence)
-        print 'solutions  : {}'.format(len(solutions))
+        print u'solutions  : {}'.format(len(solutions))
 
         if len(solutions) > 0:
             # If tokenized_sequence is allready representable by the network.
@@ -588,7 +594,7 @@ class CheckGrammaModel(object):
         else:
             # Slow path
             unmerged_nodes = self.add_unmerged_sequence(tokenized_sequence)
-            print 'unmerged_nodes  : {}'.format(len(unmerged_nodes))
+            print u'unmerged_nodes  : {}'.format(len(unmerged_nodes))
             merge_nodes = set()
             for node in unmerged_nodes:
                 best_merge_node = self.find_optimal_merge(node, dataset)
@@ -629,7 +635,7 @@ class CheckGrammaModel(object):
 def train(sequences, verbose=False):
     if verbose:
         #print 'Training GrammaModel with {len(sequences)} sequences'.format(len(sequences)
-        print 'Training GrammaModel with  {}: {}'.format(len(sequences), sequences)
+        print u'Training GrammaModel with  {}: {}'.format(len(sequences), sequences)
     model = CheckGrammaModel()
 
     # Add remaining sequences by merge
@@ -637,7 +643,7 @@ def train(sequences, verbose=False):
     for i, sequence in enumerate(sequences):
         if verbose:
             #print u'  {i}: {sequence}'
-            print '  {}: {}'.format(i, sequence)
+            print u'  {}: {}'.format(i, sequence)
         tokenized_sequence = tokenize(sequence)
         tokenized_sequences.append(tokenized_sequence)
         model.merge_sequence(tokenized_sequence, tokenized_sequences)
@@ -647,4 +653,6 @@ def train(sequences, verbose=False):
 
 def validate(model, sequence,
              threshold=0.0):
-    return model.sequence_properbility(tokenize(sequence)) > threshold
+    dsf = tokenize(sequence)
+    print dsf
+    return model.sequence_properbility(dsf) > threshold

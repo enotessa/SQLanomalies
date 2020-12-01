@@ -1,6 +1,6 @@
 package com.enotessa.SQLanomalies;
 
-enum Roles {
+public enum Roles {
     ADMIN,      // администратор
     REGISTRY,   // регистратура
     DOCTOR,     // врач

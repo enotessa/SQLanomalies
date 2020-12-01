@@ -22,8 +22,12 @@ public class MainClassGrigorov {
 
     ArrayList<ArrayList> dataAfterQuery;
 
-    public MainClassGrigorov(Connection connection) throws SQLException {
-        stmt = connection.createStatement();
+    public MainClassGrigorov(Connection connection) {
+        try {
+            stmt = connection.createStatement();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
         this.connection = connection;
         scriptRunner = new ScriptRunner(connection, stmt);
     }

@@ -1,45 +1,39 @@
 package com.enotessa.SQLanomalies;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 
 public class ReadSQL {
     FileReader file;
     public ArrayList<String> arrayList = new ArrayList();
 
-    public ReadSQL(FileReader fileWithQueries) {
-        file = fileWithQueries;
+    public ReadSQL() throws IOException {
         readFile();
     }
 
     /**
      * прочитать файл с запросами и поместить их в массив
-     *
      */
-    void readFile() {
+    void readFile() throws IOException {
         int n = 0;
-        BufferedReader reader = new BufferedReader(file);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("C:\\Users\\Admin\\IdeaProjects\\SQLanomalies\\src\\main\\resources\\queries.txt"), "UTF-8"));
+
+        //BufferedReader reader = new BufferedReader(file);
         // считаем сначала первую строку
         String line = null;
-        try {
-            line = reader.readLine();
-            while (line != null) {
-                if (line.equals("")) {
-                    n++;
+        line = reader.readLine();
+        while (line != null) {
+            if (line.equals("")) {
+                n++;
+            } else {
+                if (arrayList.size() == n) {
+                    arrayList.add(line);
                 } else {
-                    if (arrayList.size() == n) {
-                        arrayList.add(line);
-                    } else {
-                        arrayList.set(n, arrayList.get(n) + " " + line);
-                    }
+                    arrayList.set(n, arrayList.get(n) + " " + line);
                 }
-                // считываем остальные строки в цикле
-                line = reader.readLine();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            // считываем остальные строки в цикле
+            line = reader.readLine();
         }
     }
 

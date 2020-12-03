@@ -91,7 +91,7 @@ public class CheckDistribution {
                 }
                 intervals.set(1, intervals.get(1) + value);
                 k++;
-            } else if (value < 0.005) {
+            } else if (value < 0.009) {
                 if (!F) {
                     intervals.set(1, intervals.get(1) / k);
                     k = 0;
@@ -99,7 +99,7 @@ public class CheckDistribution {
                 }
                 intervals.set(2, intervals.get(2) + value);
                 k++;
-            } else if (value < 0.09) {
+            } else if (value < 0.03) {
                 if (F) {
                     intervals.set(2, intervals.get(2) / k);
                     k = 0;
@@ -119,6 +119,9 @@ public class CheckDistribution {
         }
         intervals.set(4, intervals.get(4) / k);
         findingThreshold(sequences);
+
+        System.out.println("=====================");
+        sortedGlobalFrequencies.entrySet().stream().forEach(System.out::println);
         //System.out.println("threshold = "+threshold);
     }
 

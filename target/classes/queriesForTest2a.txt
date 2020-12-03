@@ -1,0 +1,41 @@
+1 SELECT id_pet, name_pet FROM pet NATURAL JOIN appointment NATURAL JOIN app_dia NATURAL JOIN diagnosis WHERE diagnosis.name_dia = "бешенство";
+
+1 SELECT name_dia FROM diagnosis NATURAL JOIN app_dia NATURAL JOIN appointment NATURAL JOIN pet WHERE name_pet = "Мерида";
+
+1 SELECT date_app FROM appointment NATURAL JOIN pet WHERE pet.id_pet = 200007;
+
+1 SELECT lname_d, name_d, patron_d FROM doctor WHERE N_cabinet = 12;
+
+1 SELECT tel FROM owner NATURAL JOIN pet WHERE pet.id_pet = 200003;
+
+1 SELECT id_pet, name_pet FROM pet NATURAL JOIN appointment NATURAL JOIN app_dia NATURAL JOIN diagnosis WHERE name_dia = "cтригущий лишай" AND gender = "м";
+
+1 SELECT distinct id_pet, name_pet FROM pet NATURAL JOIN appointment NATURAL JOIN app_dia NATURAL JOIN diagnosis WHERE name_dia = "чума" AND gender = "ж";
+
+1 SELECT count(*) FROM doctor;
+
+1 SELECT count(date_app) FROM appointment WHERE date_app BETWEEN '2019-01-19' AND '2019-04-01';
+
+1 SELECT appointment.date_app FROM owner NATURAL JOIN pet NATURAL JOIN appointment WHERE id_owner = 100001;
+
+1 SELECT date_app FROM appointment NATURAL JOIN doctor where doctor.lname_d="Чернов";
+
+1 SELECT distinct lname_d, name_d, patron_d FROM doctor NATURAL JOIN app_dia NATURAL JOIN appointment NATURAL JOIN diagnosis WHERE diagnosis.name_dia = "отодектоз";
+
+1 SELECT id_owner, lname, name, patron, tel FROM owner NATURAL JOIN pet NATURAL JOIN appointment NATURAL JOIN doctor WHERE doctor.lname_d = "Громов";
+
+1 SELECT count(*) FROM appointment NATURAL JOIN doctor WHERE doctor.lname_d = "Чернов";
+
+1 SELECT count(*) FROM pet WHERE gender = "м";
+
+1 SELECT id_pet, name_pet FROM pet NATURAL JOIN appointment WHERE date_app >= "2019-04-01" AND date_app <= "2020-09-21";
+
+1 SELECT tel FROM owner NATURAL JOIN pet WHERE pet.id_pet = 200005;
+
+1 SELECT * FROM diagnosis;
+
+1 SELECT N_cabinet, lname_d FROM doctor NATURAL JOIN appointment WHERE date_app = "2019-03-03";
+
+0 SELECT * FROM pet WHERE gender = "f";
+
+0 SELECT * FROM pet WHERE gender = "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&";

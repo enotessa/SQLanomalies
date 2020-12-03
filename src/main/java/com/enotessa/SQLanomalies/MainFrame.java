@@ -207,7 +207,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         J1Method.setBackground(new java.awt.Color(42, 157, 143));
         J1Method.setForeground(new java.awt.Color(242, 239, 233));
-        J1Method.setText("1. метод Винья, Валер, Мутц");
+        J1Method.setText("1. метод Вигна, Валер, Мутц");
         J1Method.setBorder(null);
         J1Method.setBorderPainted(false);
         J1Method.addActionListener(new java.awt.event.ActionListener() {
@@ -401,8 +401,10 @@ public class MainFrame extends javax.swing.JFrame {
 
 
     private void J1MethodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_J1MethodActionPerformed
-        int errors1 = 0;
-        int errors2 = 0;
+        double errors1 = 0;
+        double errors2 = 0;
+        double trueAnomaly = 0;
+        double trueNormal = 0;
 
         jTextMethod1.setText("");
         String q = jTextQuery.getText();
@@ -420,8 +422,8 @@ public class MainFrame extends javax.swing.JFrame {
                 else bool.add(false);
                 query = qu.substring(2);
             }
-            else query = qu.substring(2);
-            jTextMethod1.setText(jTextMethod1.getText() + "\n" + i + " запрос :");
+            else query = qu;
+            jTextMethod1.setText(jTextMethod1.getText() + "\nзапрос : " + query);
             boolean chLength = checkLength.validate(query);
             jTextMethod1.setText(jTextMethod1.getText() + "\n   Проверка на длину строки : " + chLength);
             boolean chDistribution = checkDistribution.validate(query);
@@ -431,21 +433,34 @@ public class MainFrame extends javax.swing.JFrame {
             if (chDistribution&&chLength&&chToken){
                 jTextMethod1.setText(jTextMethod1.getText() + "\n запрос НОРМАЛЬНЫЙ");
                 if (jCheckBox1.isSelected()) {
-                    if (!bool.get(i)) errors1++;
+                    if (!bool.get(i)) errors2++;    // ложное отрицание (1 рода)
+                    else trueNormal++;
                 }
             }
             else {
                 jTextMethod1.setText(jTextMethod1.getText() + "\n запрос АНОМАЛЬНЫЙ");
                 if (jCheckBox1.isSelected()) {
-                    if (!bool.get(i)) errors2++;
+                    if (bool.get(i)) errors1++;    // ложное срабатывание (2 рода)
+                    else trueAnomaly++;
                 }
             }
             jTextMethod1.setText(jTextMethod1.getText() + "");
             i++;
         }
         if (jCheckBox1.isSelected()) {
-            jTextResult.setText("ложное срабатывание : " + errors1);
-            jTextResult.setText(jTextResult.getText() + "\n ложное отрицание : " + errors2);
+            //jTextResult.setText("ложное срабатывание : " + errors1);
+            //jTextResult.setText(jTextResult.getText() + "\n ложное отрицание : " + errors2);
+
+            double n1 = (double)(trueNormal/(trueNormal+errors2));
+            jTextResult.setText(" распознано нормальных запросов : " + n1);
+            double n2 = (double)(trueAnomaly/(trueAnomaly+errors1));
+            jTextResult.setText(jTextResult.getText() + "\n распознано аномальных запросов : " + n2);
+            double n3 = (double)(errors1/(errors1+trueNormal));
+            jTextResult.setText(jTextResult.getText() + "\n процент ложного срабатывания : " + n3);
+            double n4 = (double)(errors2/(errors2+trueAnomaly));
+            jTextResult.setText(jTextResult.getText() + "\n процент ложного отрицания : " + n4);
+            double n5 = (double)(errors1+errors2)/(double)arrayQueries.size();
+            jTextResult.setText(jTextResult.getText() + "\n процент ложного срабатывания и отрицания : " + n5);
         }
     }//GEN-LAST:event_J1MethodActionPerformed
 
@@ -462,20 +477,72 @@ public class MainFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_JloginActionPerformed
 
+
+
     private void J2MethodActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_J2MethodActionPerformed
-        String query = jTextQuery.getText();
-        MainClassGrigorov mainClassGrigorov = new MainClassGrigorov(connection);
-        boolean k = false;
-        try {
-            k = mainClassGrigorov.methodRun(query);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        double errors1 = 0;
+        double errors2 = 0;
+        double trueAnomaly = 0;
+        double trueNormal = 0;
+        MainClassGrigorov mainClassGrigorov = new MainClassGrigorov(connectionClass);
+
+        jTextMethod1.setText("");
+        String q = jTextQuery.getText();
+        String[]queries = q.split("\n");
+        ArrayList<String> arrayQueries = new ArrayList<String>(Arrays.asList(queries));
+        ArrayList<Boolean> bool = new ArrayList<Boolean>();
+        int i = 0;
+        for (String qu : arrayQueries) {
+            String query;
+            if (jCheckBox1.isSelected()) {
+                Boolean b = Boolean.FALSE;
+                String substr = qu.substring(0, 1);
+                if (substr.equals("1"))
+                    bool.add(true);
+                else bool.add(false);
+                query = qu.substring(2);
+            }
+            else query = qu;
+
+
+            boolean k = false;
+            try {
+                k = mainClassGrigorov.methodRun(query);
+            } catch (ParseException | IOException e) {
+                e.printStackTrace();
+            }
+            if (k){
+                jTextMethod1.setText(jTextMethod1.getText() + "\n запрос НОРМАЛЬНЫЙ");
+                if (jCheckBox1.isSelected()) {
+                    if (!bool.get(i)) errors2++;    // ложное отрицание (1 рода)
+                    else trueNormal++;
+                }
+            }
+            else {
+                jTextMethod1.setText(jTextMethod1.getText() + "\n запрос АНОМАЛЬНЫЙ");
+                if (jCheckBox1.isSelected()) {
+                    if (bool.get(i)) errors1++;    // ложное срабатывание (2 рода)
+                    else trueAnomaly++;
+                }
+            }
         }
-        if (k)
-            jTextMethod1.setText("запрос признан нормальным");
-        else jTextMethod1.setText("запрос признан аномальным");
+
+
+        if (jCheckBox1.isSelected()) {
+            //jTextResult.setText("ложное срабатывание : " + errors1);
+            //jTextResult.setText(jTextResult.getText() + "\n ложное отрицание : " + errors2);
+
+            double n1 = (double)(trueNormal/(trueNormal+errors2));
+            jTextResult.setText(" распознано нормальных запросов : " + n1);
+            double n2 = (double)(trueAnomaly/(trueAnomaly+errors1));
+            jTextResult.setText(jTextResult.getText() + "\n распознано аномальных запросов : " + n2);
+            double n3 = (double)(errors1/(errors1+trueNormal));
+            jTextResult.setText(jTextResult.getText() + "\n процент ложного срабатывания : " + n3);
+            double n4 = (double)(errors2/(errors2+trueAnomaly));
+            jTextResult.setText(jTextResult.getText() + "\n процент ложного отрицания : " + n4);
+            double n5 = (double)(errors1+errors2)/(double)arrayQueries.size();
+            jTextResult.setText(jTextResult.getText() + "\n процент ложного срабатывания и отрицания : " + n5);
+        }
     }//GEN-LAST:event_J2MethodActionPerformed
 
     private void jButtonFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonFileActionPerformed

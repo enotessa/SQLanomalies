@@ -49,7 +49,6 @@ public class ScriptRunner {
      */
     ArrayList<ArrayList> getDataFromTable(String queryForGetData){
         ArrayList<ArrayList> data = new ArrayList<>();
-        String output;
         try {
             rs = stmt.executeQuery(queryForGetData);
             ResultSetMetaData rsmd = rs.getMetaData();

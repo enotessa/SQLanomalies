@@ -1,5 +1,6 @@
 package com.enotessa.SQLanomalies.grigorov;
 
+import com.enotessa.SQLanomalies.ConnectionClass;
 import org.jgrapht.Graph;
 import org.jgrapht.graph.DefaultWeightedEdge;
 
@@ -15,16 +16,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainClassGrigorov {
+    ConnectionClass connectionClass;
     Connection connection;
     ScriptRunner scriptRunner;
     Statement stmt;
     Set<String> usingTables;
 
-    ArrayList<ArrayList> dataAfterQuery;
+    ArrayList<ArrayList> dataFull;
 
-    public MainClassGrigorov(Connection connection) {
+    public MainClassGrigorov(ConnectionClass cC) {
+        connectionClass = cC;
         try {
-            stmt = connection.createStatement();
+            stmt = connectionClass.connection.createStatement();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -43,12 +46,14 @@ public class MainClassGrigorov {
         assert connection != null;
 
         //scriptRunner.runScript(queryStr);     //TODO потом раскомментить
-        dataAfterQuery = scriptRunner.getDataFromTable(queryForSelectData.toString());
-        dataAfterQuery.forEach(System.out::println);
+        //TODO добавить данные из исх запроса
+        dataFull = scriptRunner.getDataFromTable(queryForSelectData.toString());  //TODO переименовать в общие данные
+        dataFull.forEach(System.out::println);
         System.out.println("\n");
 
         GraphModel graphModel = new GraphModel();
-        Graph<ArrayList, DefaultWeightedEdge> graph = graphModel.createGraph(dataAfterQuery);
+        //TODO добавить граф и для исх запроса
+        Graph<ArrayList, DefaultWeightedEdge> graph = graphModel.createGraph(dataFull);   // TODO можно сократить, записав вместо dataAfterQuery ->scriptRunner.getDataFromTable(queryForSelectData.toString())
         double density = densityGraph(graph);
         if (density>alpha)
             return true;

@@ -4,7 +4,7 @@
 
 1 SELECT * FROM appointment WHERE date_app >= '2019-03-21' and date_app <= '2019-05-15';
 
-1 SELECT DISTINCT concat(lname, ' ' , name,' ', patron) AS FIO, owner.tel from owner;
+1 SELECT DISTINCT concat(lname, ' ' , name,' ', patron) AS FIO, owner.tel FROM owner;
 
 1 SELECT lname_d, name_d, patron_d FROM doctor WHERE N_cabinet = 13;
 
@@ -50,8 +50,6 @@ FROM (SELECT count(diagnosis.id_diagnosis) AS count_dia FROM app_dia NATURAL JOI
 
 1 SELECT N_cabinet, lname_d FROM doctor NATURAL JOIN appointment WHERE date_app = "2019-05-24";
 
-1 DELETE FROM appointment WHERE id_appointment = 600011;
-
 1 SELECT id_pet, name_pet FROM pet NATURAL JOIN appointment NATURAL JOIN app_dia NATURAL JOIN diagnosis WHERE diagnosis.name_dia = "ринит";
 
 1 SELECT tel FROM owner NATURAL JOIN pet WHERE pet.name_pet = "Мерида";
@@ -60,7 +58,7 @@ FROM (SELECT count(diagnosis.id_diagnosis) AS count_dia FROM app_dia NATURAL JOI
 
 1 SELECT lname_d, name_d, patron_d FROM doctor NATURAL JOIN app_dia NATURAL JOIN appointment NATURAL JOIN diagnosis WHERE diagnosis.name_dia = "cтригущий лишай";
 
-1 SELECT distinct name_pet FROM pet NATURAL JOIN appointment WHERE EXISTS(SELECT id_appointment FROM appointment);
+1 SELECT DISTINCT name_pet FROM pet NATURAL JOIN appointment WHERE EXISTS(SELECT id_appointment FROM appointment);
 
 1 SELECT name_pet FROM pet;
 

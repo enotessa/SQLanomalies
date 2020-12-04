@@ -22,8 +22,6 @@ public class MainClassGrigorov {
     Statement stmt;
     Set<String> usingTables;
 
-    ArrayList<ArrayList> dataFull;
-
     public MainClassGrigorov(ConnectionClass cC) {
         connectionClass = cC;
         try {
@@ -41,23 +39,36 @@ public class MainClassGrigorov {
      * @param queryStr запрос
      */
     public boolean methodRun(String queryStr) throws ParseException, IOException {
+        System.out.println(queryStr);
         double alpha = 0.25;
-        String queryForSelectData = createQueryForSelectData(queryStr);
+        String queryForSelectFullData = createQueryForSelectFullData(queryStr);
+        String queryForSelectDataAfter = createQueryForSelectData(queryStr);
+        System.out.println(queryForSelectFullData);
+        System.out.println(queryForSelectDataAfter);
+
         assert connection != null;
-
         //scriptRunner.runScript(queryStr);     //TODO потом раскомментить
-        //TODO добавить данные из исх запроса
-        dataFull = scriptRunner.getDataFromTable(queryForSelectData.toString());  //TODO переименовать в общие данные
-        dataFull.forEach(System.out::println);
         System.out.println("\n");
-
         GraphModel graphModel = new GraphModel();
-        //TODO добавить граф и для исх запроса
-        Graph<ArrayList, DefaultWeightedEdge> graph = graphModel.createGraph(dataFull);   // TODO можно сократить, записав вместо dataAfterQuery ->scriptRunner.getDataFromTable(queryForSelectData.toString())
-        double density = densityGraph(graph);
+        Graph<ArrayList, DefaultWeightedEdge> graphDataFull = graphModel.createGraph(scriptRunner.getDataFromTable(queryForSelectFullData));
+
+        Graph<ArrayList, DefaultWeightedEdge> graphDataAfterQuery = graphModel.createGraphDataAfterQuery(scriptRunner.getDataFromTable(queryForSelectDataAfter), graphDataFull);    //TODO посмотреть алгоритм. тут нужен другой
+
+
+        double density = densityGraph(graphDataAfterQuery);
         if (density>alpha)
             return true;
         else return false;
+    }
+
+    private String createQueryForSelectData(String queryStr) {
+        String regex = "SELECT ([^F]*)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(queryStr);
+        matcher.find();
+        String query = queryStr.replace(matcher.group(1),"* ");
+
+        return query;
     }
 
     /**
@@ -66,16 +77,10 @@ public class MainClassGrigorov {
      * @param queryStr запрос
      * @return строка запроса
      */
-    private String createQueryForSelectData(String queryStr) {
+    private String createQueryForSelectFullData(String queryStr) {
         usingTables = new LinkedHashSet<>();
         StringBuilder query =  new StringBuilder("SELECT * ");
-        /*String regex1 = "^SELECT";
-        Pattern pattern = Pattern.compile(regex1);
-        Matcher matcher = pattern.matcher(queryStr);
-        if (matcher.find()){
-            return queryStr;
-        }*/
-        String regex = "(FROM |NATURAL JOIN |UPDATE )([^ (]*)";
+        String regex = "(FROM |NATURAL JOIN )([^ ()]*)";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(queryStr);
         boolean F = true;
@@ -104,9 +109,9 @@ public class MainClassGrigorov {
     private double densityGraph(Graph<ArrayList, DefaultWeightedEdge> graph) {
         double density = 0;
         System.out.println(graph.edgeSet().size());
-        System.out.println(graph.vertexSet().size()*(graph.vertexSet().size()-1));
+        System.out.println(graph.vertexSet().size()*(graph.vertexSet().size()));
         density = graph.edgeSet().size();
-        density = density / (graph.vertexSet().size()*graph.vertexSet().size()-1);
+        density = density / (graph.vertexSet().size()*graph.vertexSet().size());
 
         return density;
     }

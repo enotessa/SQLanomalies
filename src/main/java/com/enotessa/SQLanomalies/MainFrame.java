@@ -406,11 +406,11 @@ public class MainFrame extends javax.swing.JFrame {
         double trueAnomaly = 0;
         double trueNormal = 0;
 
-        jTextMethod1.setText("");
         String q = jTextQuery.getText();
         String[]queries = q.split("\n");
         ArrayList<String> arrayQueries = new ArrayList<String>(Arrays.asList(queries));
         ArrayList<Boolean> bool = new ArrayList<Boolean>();
+        jTextResult.setText(" Всего запросов : " + arrayQueries.size());
         int i = 0;
         for (String qu : arrayQueries) {
             String query;
@@ -492,6 +492,7 @@ public class MainFrame extends javax.swing.JFrame {
         ArrayList<String> arrayQueries = new ArrayList<String>(Arrays.asList(queries));
         ArrayList<Boolean> bool = new ArrayList<Boolean>();
         int i = 0;
+        jTextResult.setText(" Всего запросов : " + arrayQueries.size());
         for (String qu : arrayQueries) {
             String query;
             if (jCheckBox1.isSelected()) {
@@ -503,6 +504,7 @@ public class MainFrame extends javax.swing.JFrame {
                 query = qu.substring(2);
             }
             else query = qu;
+            jTextMethod1.setText(jTextMethod1.getText() + "\nзапрос : " + query);
 
 
             boolean k = false;
@@ -533,7 +535,7 @@ public class MainFrame extends javax.swing.JFrame {
             //jTextResult.setText(jTextResult.getText() + "\n ложное отрицание : " + errors2);
 
             double n1 = (double)(trueNormal/(trueNormal+errors2));
-            jTextResult.setText(" распознано нормальных запросов : " + n1);
+            jTextResult.setText(jTextResult.getText() + "\n распознано нормальных запросов : " + n1);
             double n2 = (double)(trueAnomaly/(trueAnomaly+errors1));
             jTextResult.setText(jTextResult.getText() + "\n распознано аномальных запросов : " + n2);
             double n3 = (double)(errors1/(errors1+trueNormal));

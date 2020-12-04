@@ -21,15 +21,16 @@ public class MinMaxKnowledgeModule {
 
     void minMax(ArrayList<ArrayList> dataAfterQuery, Graph<ArrayList, DefaultWeightedEdge> graph, ArrayList<TypeOfAttribute> typeOfColumns) throws ParseException {
         this.typeOfColumns = typeOfColumns;
+
         // находим верхнюю и нижнюю границы значений
+
         topBound = getTopBound(dataAfterQuery);
-        bottomBound = getBottomBound(dataAfterQuery);
-
-
         System.out.println("topBound");
-        topBound.stream().forEach(System.out::println);
+        topBound.forEach(System.out::println);
+
+        bottomBound = getBottomBound(dataAfterQuery);
         System.out.println("bottomBound");
-        bottomBound.stream().forEach(System.out::println);
+        bottomBound.forEach(System.out::println);
 
 
         for (int i=0; i< dataAfterQuery.size(); i++){
@@ -42,6 +43,8 @@ public class MinMaxKnowledgeModule {
                 else graph.setEdgeWeight(e, 0);*/
             }
         }
+        System.out.println("\nребра\n");
+        graph.edgeSet().forEach(System.out::println);
 
     }
 
@@ -141,8 +144,8 @@ public class MinMaxKnowledgeModule {
                             if (record.get(j).equals(dataAfterQuery.get(i).get(j))){
                                 for (int k=0; k<record.size(); k++){
                                     if (typeOfColumns.get(k).equals(TypeOfAttribute.STRING)){
-                                        if (record.get(k).toString().length()>topBound.get(i).get(k).toString().length()-5){
-                                            topBound.get(i).set(k, record.get(k).toString().length()+5);
+                                        if (record.get(k).toString().length()>Integer.parseInt (topBound.get(i).get(k).toString())){
+                                            topBound.get(i).set(k, record.get(k).toString().length());
                                         }
                                     }
                                 }
@@ -151,6 +154,17 @@ public class MinMaxKnowledgeModule {
                         break;
 
                     case NUMBER :
+                        /*for (ArrayList record : dataAfterQuery){
+                            if (record.get(j).equals(dataAfterQuery.get(i).get(j))){
+                                for (int k=0; k<record.size(); k++){
+                                    if (typeOfColumns.get(k).equals(TypeOfAttribute.STRING)){
+                                        if (record.get(k).toString().length()>topBound.get(i).get(k).toString().length()-5){
+                                            topBound.get(i).set(k, record.get(k).toString().length()+5);
+                                        }
+                                    }
+                                }
+                            }
+                        }*/
                         break;
                 }
             }
@@ -205,11 +219,11 @@ public class MinMaxKnowledgeModule {
 
                     case STRING :
                         for (ArrayList record : dataAfterQuery){
-                            if (record.get(j).equals(dataAfterQuery.get(i).get(j))){    //TODO проверка на одну и ту же запись
+                            if (record.get(j).equals(dataAfterQuery.get(i).get(j))){
                                 for (int k=0; k<record.size(); k++){
                                     if (typeOfColumns.get(k).equals(TypeOfAttribute.STRING)){
-                                        if (record.get(k).toString().length()<dataAfterQuery.get(i).get(k).toString().length()+5){   //TODO dataAfterQuery заменить на bottomBound
-                                            bottomBound.get(i).set(k, record.get(k).toString().length()-5);
+                                        if (record.get(k).toString().length()<Integer.parseInt(bottomBound.get(i).get(k).toString())){
+                                            bottomBound.get(i).set(k, record.get(k).toString().length());
                                         }
                                     }
                                 }

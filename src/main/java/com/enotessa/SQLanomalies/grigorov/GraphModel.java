@@ -28,6 +28,8 @@ public class GraphModel {
             graph.addVertex(arr);
         }
         minMaxKnowledgeModule.minMax(dataAfterQuery, graph, typeOfColumns);
+        System.out.println("\n Граф полный:\n");
+        graph.vertexSet().stream().forEach(System.out::println);
         return graph;
     }
 
@@ -71,5 +73,28 @@ public class GraphModel {
             typeOfColumns.add(getTypeOfAttribute(attr.toString()));
         }
         return typeOfColumns;
+    }
+
+    public Graph<ArrayList, DefaultWeightedEdge> createGraphDataAfterQuery(ArrayList<ArrayList> dataAfterQuery, Graph<ArrayList, DefaultWeightedEdge> graphDataFull) {
+        Graph<ArrayList, DefaultWeightedEdge> graph = new DirectedWeightedPseudograph<ArrayList, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        for (ArrayList arr : dataAfterQuery){
+            graph.addVertex(arr);
+        }
+        System.out.println("\n Граф после запросный:\n");
+        graph.vertexSet().stream().forEach(System.out::println);
+        for (int i=0; i< dataAfterQuery.size(); i++) {
+
+            /*for (int o=0; o<graphDataFull.vertexSet().size(); o++){
+                graph.get
+            }*/
+
+            for (int j = 0; j < dataAfterQuery.size(); j++) {
+                System.out.println(graphDataFull.containsEdge(dataAfterQuery.get(i), dataAfterQuery.get(j)));
+
+                if (graphDataFull.containsEdge(dataAfterQuery.get(i), dataAfterQuery.get(j))) graph.addEdge(dataAfterQuery.get(i), dataAfterQuery.get(j));
+            }
+        }
+
+        return graph;
     }
 }

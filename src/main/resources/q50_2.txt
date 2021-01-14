@@ -1,0 +1,90 @@
+1 SELECT * FROM pet WHERE type_pet = "кошка";
+
+1 SELECT count(id_owner) as count_owner_from_Moscow FROM owner WHERE owner.address REGEXP "г.Москва"=1;
+
+1 SELECT * FROM appointment WHERE date_app >= '2019-03-21' and date_app <= '2019-05-15';
+
+1 SELECT DISTINCT concat(lname, ' ' , name,' ', patron) AS FIO, owner.tel FROM owner;
+
+1 SELECT lname_d, name_d, patron_d FROM doctor WHERE N_cabinet = 13;
+
+1 SELECT name_dia FROM diagnosis WHERE description_dia LIKE '%вирус%';
+
+1 SELECT DISTINCT concat(doctor.lname_d, ' ' , doctor.name_d,' ', doctor.patron_d) AS FIO FROM app_dia NATURAL JOIN appointment NATURAL JOIN doctor WHERE id_diagnosis IN (SELECT id_diagnosis FROM diagnosis WHERE name_dia='чума');
+
+1 SELECT DISTINCT name_pet FROM pet NATURAL JOIN appointment WHERE id_doctor IN (SELECT id_doctor FROM doctor WHERE lname_d='Чернов');
+
+1 SELECT name_dia FROM diagnosis NATURAL JOIN app_dia WHERE id_diagnosis IN (SELECT id_diagnosis FROM app_dia NATURAL JOIN appointment NATURAL JOIN pet WHERE name_pet="Мила");
+
+1 SELECT diagnosis.name_dia FROM app_dia NATURAL JOIN diagnosis NATURAL JOIN appointment
+GROUP BY id_diagnosis HAVING count(id_diagnosis) = (SELECT max(count_dia)
+FROM (SELECT count(diagnosis.id_diagnosis) AS count_dia FROM app_dia NATURAL JOIN diagnosis NATURAL JOIN appointment GROUP BY id_diagnosis) AS tab1);
+
+1 SELECT count(id_pet) AS count_pet_from_Moscow FROM pet NATURAL JOIN owner WHERE owner.address REGEXP "г.Тверь"=1;
+
+1 SELECT diagnosis.name_dia, pet.name_pet FROM app_dia NATURAL JOIN diagnosis NATURAL JOIN pet NATURAL JOIN appointment ORDER BY diagnosis.name_dia;
+
+1 SELECT doctor.lname_d FROM appointment NATURAL JOIN doctor GROUP BY doctor.lname_d HAVING count(id_appointment) < (SELECT avg(employment) FROM (SELECT count(id_appointment) AS employment FROM appointment NATURAL JOIN doctor GROUP BY doctor.lname_d) AS tab1);
+
+1 SELECT DISTINCT concat(lname, ' ' , name,' ', patron) AS FIO, tel FROM owner;
+
+1 SELECT max(appointment.date_app) AS date FROM app_dia NATURAL JOIN appointment NATURAL JOIN diagnosis WHERE diagnosis.name_dia="чума" ;
+
+1 SELECT date_add(appointment.date_app, interval (SELECT sum(dia_th.duration) FROM dia_th NATURAL JOIN diagnosis  GROUP BY diagnosis.id_diagnosis HAVING diagnosis.id_diagnosis=a1.id_diagnosis) DAY) AS end_of_therapy  FROM app_dia AS a1 NATURAL JOIN diagnosis NATURAL JOIN appointment WHERE id_appointment=600004;
+
+1 SELECT pet.name_pet FROM appointment NATURAL JOIN doctor AS doc NATURAL JOIN pet WHERE EXISTS (SELECT lname_d FROM doctor WHERE lname_d =doc.lname_d AND lname_d='Ермаков');
+
+1 SELECT date_app FROM appointment NATURAL JOIN doctor where doctor.lname_d="Чернов";
+
+1 SELECT tel_d FROM doctor where lname_d="Громов";
+
+1 SELECT lname, name, patron FROM owner NATURAL JOIN pet NATURAL JOIN appointment NATURAL JOIN doctor WHERE doctor.lname_d="Ермаков";
+
+1 SELECT count(date_app) FROM appointment WHERE date_app >= '2019-01-19' AND date_app <= '2019-04-01';
+
+1 SELECT description FROM therapy NATURAL JOIN dia_th NATURAL JOIN diagnosis WHERE name_dia = "ринит";
+
+1 SELECT name_dia FROM diagnosis NATURAL JOIN app_dia NATURAL JOIN appointment NATURAL JOIN pet WHERE name_pet = "Охра";
+
+1 SELECT lname_d, name_d, patron_d, tel_d FROM doctor;
+
+1 SELECT N_cabinet, lname_d FROM doctor NATURAL JOIN appointment WHERE date_app = "2019-05-24";
+
+1 SELECT id_pet, name_pet FROM pet NATURAL JOIN appointment NATURAL JOIN app_dia NATURAL JOIN diagnosis WHERE diagnosis.name_dia = "ринит";
+
+0 SELECT * FROM pet NATURAL JOIN appointment WHERE EXISTS(SELECT id_appointment FROM appointment);
+
+0 SELECT name_pet FROM pet NATURAL JOIN appointment NATURAL JOIN doctor WHERE doctor.name_d = "Громов";
+
+1 SELECT count(id_pet) AS count_pet_from_Moscow FROM pet NATURAL JOIN owner WHERE owner.address REGEXP "г.Тверь"=1;
+
+1 SELECT diagnosis.name_dia, pet.name_pet FROM app_dia NATURAL JOIN diagnosis NATURAL JOIN pet NATURAL JOIN appointment ORDER BY diagnosis.name_dia;
+
+1 SELECT doctor.lname_d FROM appointment NATURAL JOIN doctor GROUP BY doctor.lname_d HAVING count(id_appointment) < (SELECT avg(employment) FROM (SELECT count(id_appointment) AS employment FROM appointment NATURAL JOIN doctor GROUP BY doctor.lname_d) AS tab1);
+
+1 SELECT DISTINCT concat(lname, ' ' , name,' ', patron) AS FIO, tel FROM owner;
+
+1 SELECT max(appointment.date_app) AS date FROM app_dia NATURAL JOIN appointment NATURAL JOIN diagnosis WHERE diagnosis.name_dia="чума" ;
+
+0 SELECT date_add(appointment.date_app, interval (SELECT sum(dia_th.duration) FROM dia_th NATURAL JOIN diagnosis  GROUP BY diagnosis.id_diagnosis HAVING diagnosis.id_diagnosis=a1.id_diagnosis) DAY) AS end_of_therapy  FROM app_dia AS a1 NATURAL JOIN diagnosis NATURAL JOIN appointment WHERE id_appointment=600004;
+
+1 SELECT pet.name_pet FROM appointment NATURAL JOIN doctor AS doc NATURAL JOIN pet WHERE EXISTS (SELECT lname_d FROM doctor WHERE lname_d =doc.lname_d AND lname_d='Ермаков');
+
+1 SELECT date_app FROM appointment NATURAL JOIN doctor where doctor.lname_d="Чернов";
+
+1 SELECT tel_d FROM doctor where lname_d="Громов";
+
+0 SELECT * FROM owner;
+
+0 SELECT * FROM pet;
+
+0 SELECT * FROM doctor;
+
+0 SELECT * FROM appointment;
+
+0 SELECT * FROM diagnosis;
+
+0 SELECT * FROM therapy;
+
+
+

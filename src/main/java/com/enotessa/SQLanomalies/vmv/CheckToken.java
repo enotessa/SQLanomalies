@@ -122,7 +122,7 @@ public class CheckToken {
             while (matcher.find()) {
                 if (tokensSequence.containsKey(matcher.group(2)))
                     tokensSequence.get(matcher.group(2)).add(matcher.group(5));
-                else tokensSequence.put(matcher.group(2), new ArrayList<String>(Collections.singleton(matcher.group(5))));  // TODO кладет с запятыми??
+                else tokensSequence.put(matcher.group(2), new ArrayList<String>(Collections.singleton(matcher.group(5))));
             }
         }
 

@@ -452,12 +452,12 @@ public class MainFrame extends javax.swing.JFrame {
             //jTextResult.setText(jTextResult.getText() + "\n ложное отрицание : " + errors2);
 
             double n1 = (double)(trueNormal/(trueNormal+errors2));
-            jTextResult.setText(" распознано нормальных запросов : " + n1);
+            jTextResult.setText(jTextResult.getText() + "\n распознано нормальных запросов : " + n1);
             double n2 = (double)(trueAnomaly/(trueAnomaly+errors1));
             jTextResult.setText(jTextResult.getText() + "\n распознано аномальных запросов : " + n2);
-            double n3 = (double)(errors1/(errors1+trueNormal));
+            double n3 = (double)(errors2/(errors2+trueNormal));
             jTextResult.setText(jTextResult.getText() + "\n процент ложного срабатывания : " + n3);
-            double n4 = (double)(errors2/(errors2+trueAnomaly));
+            double n4 = (double)(errors1/(errors1+trueAnomaly));
             jTextResult.setText(jTextResult.getText() + "\n процент ложного отрицания : " + n4);
             double n5 = (double)(errors1+errors2)/(double)arrayQueries.size();
             jTextResult.setText(jTextResult.getText() + "\n процент ложного срабатывания и отрицания : " + n5);
@@ -486,7 +486,6 @@ public class MainFrame extends javax.swing.JFrame {
         double trueNormal = 0;
         MainClassGrigorov mainClassGrigorov = new MainClassGrigorov(connectionClass);
 
-        jTextMethod1.setText("");
         String q = jTextQuery.getText();
         String[]queries = q.split("\n");
         ArrayList<String> arrayQueries = new ArrayList<String>(Arrays.asList(queries));
@@ -527,6 +526,7 @@ public class MainFrame extends javax.swing.JFrame {
                     else trueAnomaly++;
                 }
             }
+            i++;
         }
 
 

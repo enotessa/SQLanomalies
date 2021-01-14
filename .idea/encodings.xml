@@ -3,6 +3,12 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/com/enotessa/SQLanomalies/MainFrame.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/q100_1.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/q100_2.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/q50_1.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/q50_2.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/q75_1.txt" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/q75_2.txt" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/queriesForTest1a.txt" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/queriesForTest1b.txt" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/queriesForTest2b.txt" charset="UTF-8" />

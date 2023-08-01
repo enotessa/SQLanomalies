@@ -373,7 +373,7 @@ public class MainFrame extends javax.swing.JFrame {
         String login = Jlogin.getText();
         String password = Jpassword.getText();
         try {
-            connectionClass = new ConnectionClass("Admin", "Admin");
+            connectionClass = new ConnectionClass(login, password);
             jTextField2.setText("подключено");
             System.out.println("подключено");
         } catch (SQLException e) {

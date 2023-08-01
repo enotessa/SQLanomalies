@@ -47,13 +47,21 @@ public class CheckLength {
      * @return true - нормальный, false - аномальный
      */
     public boolean validate(String sequence) {
+        ArrayList<String> sequences = new ArrayList<>();
+        sequences.add(sequence);
+        arguments.clear();
+        arguments = getArguments(sequences);
         double threshold = 0.1;
-        double upper_bound = this.var / Math.pow((sequence.length() - this.mean), 2);
-        return upper_bound >= threshold;
+        double upper_bound;
+        for (String argument : arguments){
+            upper_bound = this.var / Math.pow((argument.length() - this.mean), 2);
+            if (!(upper_bound >= threshold)) return false;
+        }
+        return true;
     }
 
     /**
-     * метод. который берет аргументы строк
+     * метод, который берет аргументы строк
      */
     public ArrayList<String> getArguments(ArrayList<String> sequences){
         ArrayList<String> arguments = new ArrayList<>();

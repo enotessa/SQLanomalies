@@ -63,6 +63,8 @@ public class CheckDistribution {
         // вычисляем частоту каждого символа
         double finalCountAllChars1 = countAllChars;
 
+
+
         collapsСhars.forEach((k, v) -> {
             globalFrequencies.put(k, Double.parseDouble(String.format("%.7f", (v / finalCountAllChars1)).replace(",", ".")));
         });
